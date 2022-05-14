@@ -6,7 +6,7 @@ void main() => runApp(MaterialApp(
     builder: (context, child) {
       return Directionality(textDirection: TextDirection.rtl, child: child!);
     },
-    title: 'بهشتی استور',
+    title: 'Beheshti Store',
     theme: ThemeData(
       primaryColor: Colors.grey[800],
     ),
