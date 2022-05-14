@@ -44,6 +44,14 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: new Image.asset('assets/Beheshti.png', width: 70.0),
+        toolbarHeight: 100,
+        centerTitle: true,
+        leadingWidth: 10,
+        backgroundColor: Colors.white,
+        elevation: 0,
+      ),
       body: Center(
         child: _widgetOptions.elementAt(_selectedIndex),
       ),
