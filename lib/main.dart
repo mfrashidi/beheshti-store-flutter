@@ -56,7 +56,7 @@ class _HomeState extends State<Home> {
         child: _widgetOptions.elementAt(_selectedIndex),
       ),
       bottomNavigationBar: Container(
-        margin: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+        margin: EdgeInsets.symmetric(horizontal: 30, vertical: 30),
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.75),
           borderRadius: BorderRadius.all(Radius.circular(100)),
