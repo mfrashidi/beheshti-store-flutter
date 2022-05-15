@@ -94,10 +94,8 @@ class _HomeState extends State<Home> {
         child: _widgetOptions.elementAt(_selectedIndex),
       ),
       bottomNavigationBar: Container(
-        margin: EdgeInsets.symmetric(horizontal: 30, vertical: 30),
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.75),
-          borderRadius: BorderRadius.all(Radius.circular(100)),
           boxShadow: [
             BoxShadow(
               blurRadius: 20,
@@ -107,7 +105,7 @@ class _HomeState extends State<Home> {
         ),
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 15),
             child: GNav(
               rippleColor: Colors.grey[300]!,
               hoverColor: Colors.grey[100]!,
@@ -121,15 +119,19 @@ class _HomeState extends State<Home> {
               tabs: [
                 GButton(
                   icon: LineIcons.home,
+                  iconSize: 25,
                 ),
                 GButton(
                   icon: LineIcons.compass,
+                  iconSize: 25,
                 ),
                 GButton(
                   icon: LineIcons.shoppingCart,
+                  iconSize: 25,
                 ),
                 GButton(
                   icon: LineIcons.user,
+                  iconSize: 25,
                 ),
               ],
               selectedIndex: _selectedIndex,
