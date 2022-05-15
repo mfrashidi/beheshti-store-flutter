@@ -41,6 +41,8 @@ class _HomeState extends State<Home> {
     ),
   ];
 
+  static TextStyle _appBarFont = GoogleFonts.notoSansArabic(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold);
+
   static List<AppBar> _appbars = <AppBar>[
     AppBar(
       title: new Image.asset('assets/Beheshti.png', width: 150.0),
@@ -51,8 +53,8 @@ class _HomeState extends State<Home> {
       elevation: 0,
     ),
     AppBar(
-        title: Text("تازه ها"),
-        titleTextStyle: GoogleFonts.notoSansArabic(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
+      title: Text("تازه ها"),
+      titleTextStyle: _appBarFont,
       toolbarHeight: 100,
       centerTitle: true,
       leadingWidth: 10,
@@ -61,7 +63,7 @@ class _HomeState extends State<Home> {
     ),
     AppBar(
       title: Text("سبد خرید"),
-      titleTextStyle: GoogleFonts.notoSansArabic(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
+      titleTextStyle: _appBarFont,
       toolbarHeight: 100,
       centerTitle: true,
       leadingWidth: 10,
@@ -70,7 +72,7 @@ class _HomeState extends State<Home> {
     ),
     AppBar(
       title: Text("پروفایل کاربری"),
-      titleTextStyle: GoogleFonts.notoSansArabic(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
+      titleTextStyle: _appBarFont,
       toolbarHeight: 100,
       centerTitle: true,
       leadingWidth: 10,
@@ -78,7 +80,7 @@ class _HomeState extends State<Home> {
       elevation: 0,
       leading: Transform.translate(
         offset: Offset(-20, 0),
-        child: Icon(Icons.settings, color: Colors.black,),
+        child: Icon(Icons.settings, color: Colors.black),
       )
     ),
   ];
