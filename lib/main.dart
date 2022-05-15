@@ -45,7 +45,7 @@ class _HomeState extends State<Home> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: new Image.asset('assets/Beheshti.png', width: 70.0),
+        title: new Image.asset('assets/Beheshti.png', width: 150.0),
         toolbarHeight: 100,
         centerTitle: true,
         leadingWidth: 10,
