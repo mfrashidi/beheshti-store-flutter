@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:line_icons/line_icons.dart';
 
@@ -40,18 +41,50 @@ class _HomeState extends State<Home> {
     ),
   ];
 
+  static List<AppBar> _appbars = <AppBar>[
+    AppBar(
+      title: new Image.asset('assets/Beheshti.png', width: 150.0),
+      toolbarHeight: 100,
+      centerTitle: true,
+      leadingWidth: 10,
+      backgroundColor: Colors.white,
+      elevation: 0,
+    ),
+    AppBar(
+        title: Text("تازه ها"),
+        titleTextStyle: GoogleFonts.notoSansArabic(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
+      toolbarHeight: 100,
+      centerTitle: true,
+      leadingWidth: 10,
+      backgroundColor: Colors.white,
+      elevation: 0
+    ),
+    AppBar(
+      title: Text("سبد خرید"),
+      titleTextStyle: GoogleFonts.notoSansArabic(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
+      toolbarHeight: 100,
+      centerTitle: true,
+      leadingWidth: 10,
+      backgroundColor: Colors.white,
+      elevation: 0,
+    ),
+    AppBar(
+      title: Text("پروفایل کاربری"),
+      titleTextStyle: GoogleFonts.notoSansArabic(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
+      toolbarHeight: 100,
+      centerTitle: true,
+      leadingWidth: 10,
+      backgroundColor: Colors.white,
+      elevation: 0,
+      leading: Icon(Icons.settings, color: Colors.black),
+    ),
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: new Image.asset('assets/Beheshti.png', width: 150.0),
-        toolbarHeight: 100,
-        centerTitle: true,
-        leadingWidth: 10,
-        backgroundColor: Colors.white,
-        elevation: 0,
-      ),
+      appBar: _appbars.elementAt(_selectedIndex),
       body: Center(
         child: _widgetOptions.elementAt(_selectedIndex),
       ),
