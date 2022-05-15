@@ -76,7 +76,10 @@ class _HomeState extends State<Home> {
       leadingWidth: 10,
       backgroundColor: Colors.white,
       elevation: 0,
-      leading: Icon(Icons.settings, color: Colors.black),
+      leading: Transform.translate(
+        offset: Offset(-20, 0),
+        child: Icon(Icons.settings, color: Colors.black,),
+      )
     ),
   ];
 
