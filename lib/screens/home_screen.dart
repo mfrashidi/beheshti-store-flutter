@@ -77,6 +77,9 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    double _iconSize = 30;
+    MaterialColor _inactiveIconColor = Colors.grey;
+    Color _iconBackgroundColor = Colors.white.withOpacity(0);
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: _appbars.elementAt(_selectedIndex),
@@ -102,30 +105,34 @@ class _HomeState extends State<Home> {
               gap: 8,
               activeColor: Colors.black,
               iconSize: 24,
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              padding: EdgeInsets.symmetric(horizontal: 25, vertical: 10),
               duration: Duration(milliseconds: 300),
               tabBackgroundColor: Colors.grey[100]!,
               color: Colors.black,
               tabs: [
                 GButton(
                   icon: LineIcons.store,
-                  iconSize: 25,
-                  iconColor: Colors.grey,
+                  iconSize: _iconSize,
+                  iconColor: _inactiveIconColor,
+                  backgroundColor: _iconBackgroundColor,
                 ),
                 GButton(
                   icon: LineIcons.compass,
-                  iconSize: 25,
-                  iconColor: Colors.grey,
+                  iconSize: _iconSize,
+                  iconColor: _inactiveIconColor,
+                  backgroundColor: _iconBackgroundColor,
                 ),
                 GButton(
                   icon: LineIcons.shoppingCart,
-                  iconSize: 25,
-                  iconColor: Colors.grey,
+                  iconSize: _iconSize,
+                  iconColor: _inactiveIconColor,
+                  backgroundColor: _iconBackgroundColor,
                 ),
                 GButton(
                   icon: LineIcons.user,
-                  iconSize: 25,
-                  iconColor: Colors.grey,
+                  iconSize: _iconSize,
+                  iconColor: _inactiveIconColor,
+                  backgroundColor: _iconBackgroundColor,
                 ),
               ],
               selectedIndex: _selectedIndex,
