@@ -108,20 +108,24 @@ class _HomeState extends State<Home> {
               color: Colors.black,
               tabs: [
                 GButton(
-                  icon: LineIcons.home,
+                  icon: LineIcons.store,
                   iconSize: 25,
+                  iconColor: Colors.grey,
                 ),
                 GButton(
                   icon: LineIcons.compass,
                   iconSize: 25,
+                  iconColor: Colors.grey,
                 ),
                 GButton(
                   icon: LineIcons.shoppingCart,
                   iconSize: 25,
+                  iconColor: Colors.grey,
                 ),
                 GButton(
                   icon: LineIcons.user,
                   iconSize: 25,
+                  iconColor: Colors.grey,
                 ),
               ],
               selectedIndex: _selectedIndex,
