@@ -6,7 +6,7 @@ class CategoriesScreen extends StatelessWidget {
   Widget build(BuildContext context){
     return Scaffold(
       appBar: AppBar(
-          title: Text("تازه ها"),
+          title: Text("دسته بندی کالاها"),
           titleTextStyle: GoogleFonts.notoSansArabic(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
           toolbarHeight: 100,
           centerTitle: true,
