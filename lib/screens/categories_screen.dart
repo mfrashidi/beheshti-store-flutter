@@ -56,7 +56,7 @@ class Body extends StatelessWidget {
         "text": "دیجیتال",
         "color": Color(0x9CA2F0FF),
         "fade": false,
-        "padding": 20.0,
+        "padding": 30.0,
         "width": 125.0
       },
       {"pic": "assets/screens/categories/clothing.png",
