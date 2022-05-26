@@ -61,7 +61,7 @@ class Body extends StatelessWidget {
       },
       {"pic": "assets/screens/categories/clothing.png",
         "text": "پوشاک",
-        "color": Color(0xFFFF8484),
+        "color": Color(0xFFFFA0A0),
         "fade": true,
         "padding": 10.0,
         "width": 100.0
@@ -75,7 +75,7 @@ class Body extends StatelessWidget {
       },
       {"pic": "assets/screens/categories/Tent.png",
         "text": "ورزش و سفر",
-        "color": Color(0xA2D2A7FF),
+        "color": Color(0xA2A7FFC4),
         "fade": false,
         "padding": 5.0,
         "width": 100.0
