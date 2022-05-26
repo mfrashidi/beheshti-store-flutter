@@ -8,10 +8,10 @@ class CategoriesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context){
     return Scaffold(
-      body: const Center(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 25),
+      body: AnimationLimiter(
+        child: Container(
           child: Body(),
+          padding: EdgeInsets.symmetric(horizontal: 25),
         ),
       ),
       appBar: AppBar(
@@ -91,46 +91,55 @@ class Body extends StatelessWidget {
       ),
       itemCount: categories.length,
       itemBuilder: (context, index) {
-        return Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(5)),
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                categories[index]["color"],
-                Colors.white.withOpacity(0.25),
-              ],
-            ),
-            boxShadow: [
-              BoxShadow(
-                blurRadius: 10,
-                color: Colors.black.withOpacity(.1),
-              )
-            ],
-          ),
-          child:
-          Stack(
-            children: <Widget>[
-              Align(
-                alignment: Alignment.topCenter,
-                child: Padding(
-                    padding: EdgeInsets.only(top: categories[index]["padding"]),
-                    child: categories[index]["fade"] ? fadeImage(categories[index]["pic"]) : Image.asset(categories[index]["pic"], width: categories[index]["width"]),
-                ),
-              ),
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 20),
-                  child: Text(
-                      categories[index]["text"],
-                      style: TextStyle(fontFamily: 'Beheshti', fontWeight: FontWeight.bold, fontSize: 15)
+        return AnimationConfiguration.staggeredList(
+          position: index,
+          duration: const Duration(milliseconds: 375),
+          child: SlideAnimation(
+            verticalOffset: 50.0,
+            child: FadeInAnimation(
+              child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(5)),
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        categories[index]["color"],
+                        Colors.white.withOpacity(0.25),
+                      ],
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        blurRadius: 10,
+                        color: Colors.black.withOpacity(.1),
+                      )
+                    ],
+                  ),
+                  child:
+                  Stack(
+                    children: <Widget>[
+                      Align(
+                        alignment: Alignment.topCenter,
+                        child: Padding(
+                          padding: EdgeInsets.only(top: categories[index]["padding"]),
+                          child: categories[index]["fade"] ? fadeImage(categories[index]["pic"]) : Image.asset(categories[index]["pic"], width: categories[index]["width"]),
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Padding(
+                            padding: const EdgeInsets.only(bottom: 20),
+                            child: Text(
+                                categories[index]["text"],
+                                style: TextStyle(fontFamily: 'Beheshti', fontWeight: FontWeight.bold, fontSize: 15)
+                            )
+                        ),
+                      )
+                    ],
                   )
-                ),
-              )
-            ],
-          )
+              ),
+            ),
+          ),
         );
       },
     );
