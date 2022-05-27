@@ -16,6 +16,7 @@ void main() => runApp(MaterialApp(
     title: 'Beheshti Store',
     theme: ThemeData(
       primaryColor: Colors.grey[800],
+      scaffoldBackgroundColor: Colors.white
     ),
     home: HomePage()));
 
