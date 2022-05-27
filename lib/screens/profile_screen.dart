@@ -18,7 +18,7 @@ class ProfileScreen extends StatelessWidget {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white.withOpacity(0),
-        toolbarHeight: 230,
+        toolbarHeight: 210,
         flexibleSpace: Padding(
           padding: EdgeInsets.only(top: 50),
           child: Stack(
