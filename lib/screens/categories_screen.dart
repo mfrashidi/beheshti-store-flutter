@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
 class CategoriesScreen extends StatelessWidget {
@@ -15,8 +14,15 @@ class CategoriesScreen extends StatelessWidget {
         ),
       ),
       appBar: AppBar(
-          title: Text("دسته بندی کالاها"),
-          titleTextStyle: GoogleFonts.notoSansArabic(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
+          title: Text(
+              "دسته بندی کالاها",
+              style: TextStyle(
+                  fontFamily: 'Beheshti',
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                  color: Colors.black
+              )
+          ),
           toolbarHeight: 100,
           centerTitle: true,
           leadingWidth: 10,
