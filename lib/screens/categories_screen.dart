@@ -82,6 +82,7 @@ class Body extends StatelessWidget {
       },
     ];
     return GridView.builder(
+      physics: BouncingScrollPhysics(),
       shrinkWrap: true,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
