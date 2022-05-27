@@ -14,51 +14,15 @@ class ProfileScreen extends StatelessWidget {
           child: Body(),
           padding: EdgeInsets.symmetric(horizontal: 25),
         ),
-      )
-    );
-  }
-}
-
-class Body extends StatelessWidget {
-  const Body({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    List<Map<String, dynamic>> statistics = [
-      {"logo": "assets/screens/profile/item.png",
-        "text": "کالاهای من",
-        "number": "۶"
-      },
-      {"logo": "assets/screens/profile/basket.png",
-        "text": "سفارش ها",
-        "number": "۱۴"
-      },
-    ];
-    List<Map<String, dynamic>> settings = [
-      {"logo": "assets/screens/profile/item.png",
-        "text": "کالاهای من",
-      },
-      {"logo": "assets/screens/profile/basket.png",
-        "text": "سفارش ها",
-      },
-      {"logo": "assets/screens/profile/heart.png",
-        "text": "علاقه‌مندی ها",
-      },
-      {"logo": "assets/screens/profile/address.png",
-        "text": "آدرس ها",
-      },
-    ];
-    return ListView(
-      physics: BouncingScrollPhysics(),
-      children: [
-        Padding(
-          padding: EdgeInsets.only(top: 30, bottom: 20),
+      ),
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.white.withOpacity(0),
+        toolbarHeight: 230,
+        flexibleSpace: Padding(
+          padding: EdgeInsets.only(top: 50),
           child: Stack(
             children: [
-              Align(
-                alignment: Alignment.centerRight,
-                child: Icon(LineIcons.pen),
-              ),
               Align(
                 alignment: Alignment.center,
                 child: Column(
@@ -102,20 +66,61 @@ class Body extends StatelessWidget {
                   ],
                 ),
               ),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Icon(LineIcons.doorOpen),
+              Padding(
+                padding: EdgeInsets.only(left: 30, top: 40),
+                child:
+                  Align(
+                    alignment: Alignment.topLeft,
+                    child: Icon(LineIcons.doorOpen),
+                  )
               ),
-          ],
+            ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class Body extends StatelessWidget {
+  const Body({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    List<Map<String, dynamic>> statistics = [
+      {"logo": "assets/screens/profile/item.png",
+        "text": "کالاهای من",
+        "number": "۶"
+      },
+      {"logo": "assets/screens/profile/basket.png",
+        "text": "سفارش ها",
+        "number": "۱۴"
+      },
+    ];
+    List<Map<String, dynamic>> settings = [
+      {"logo": "assets/screens/profile/user.png",
+        "text": "پروفایل کاربری",
+      },
+      {"logo": "assets/screens/profile/heart.png",
+        "text": "علاقه‌مندی ها",
+      },
+      {"logo": "assets/screens/profile/comment.png",
+        "text": "نظرات",
+      },
+      {"logo": "assets/screens/profile/address.png",
+        "text": "آدرس ها",
+      },
+    ];
+    return ListView(
+      physics: BouncingScrollPhysics(),
+      children: [
         GridView.builder(
           physics: BouncingScrollPhysics(),
           padding: EdgeInsets.only(bottom: 30),
           shrinkWrap: true,
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
-            childAspectRatio: 3,
+            childAspectRatio: 2,
             crossAxisSpacing: 30,
             mainAxisSpacing: 30,
           ),
@@ -127,6 +132,18 @@ class Body extends StatelessWidget {
               child: FadeInAnimation(
                 child: FadeInAnimation(
                   child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.04),
+                            spreadRadius: 0,
+                            blurRadius: 10,
+                            offset: Offset(0, 7), // changes position of shadow
+                          ),
+                        ],
+                      ),
                       child:
                           Row(
                             children: [
