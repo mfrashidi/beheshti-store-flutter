@@ -10,6 +10,7 @@ import 'package:line_icons/line_icons.dart';
 TextStyle appBarFont = GoogleFonts.notoSansArabic(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold);
 
 void main() => runApp(MaterialApp(
+    debugShowCheckedModeBanner: false,
     builder: (context, child) {
       return Directionality(textDirection: TextDirection.rtl, child: child!);
     },
