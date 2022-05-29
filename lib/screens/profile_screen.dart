@@ -20,7 +20,7 @@ class ProfileScreen extends StatelessWidget {
         backgroundColor: Colors.white.withOpacity(0),
         toolbarHeight: 210,
         flexibleSpace: Padding(
-          padding: EdgeInsets.only(top: 50),
+          padding: EdgeInsets.only(top: 75),
           child: Stack(
             children: [
               Align(
