@@ -39,7 +39,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     pages = [
-      HomeScreen(() => changeActivePage(2)),
+      HomeScreen(),
       CategoriesScreen(),
       CartScreen(),
       ProfileScreen()
