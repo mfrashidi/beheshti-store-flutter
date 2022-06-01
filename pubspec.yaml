@@ -35,6 +35,7 @@ dependencies:
   simple_animations: ^4.0.2
   badges: ^2.0.2
   glassmorphism: any
+  anim_search_bar: ^2.0.2
   flutter:
     sdk: flutter
 
