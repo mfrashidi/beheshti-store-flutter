@@ -36,6 +36,7 @@ dependencies:
   badges: ^2.0.2
   glassmorphism: any
   anim_search_bar: ^2.0.2
+  carousel_slider: ^4.1.1
   flutter:
     sdk: flutter
 
