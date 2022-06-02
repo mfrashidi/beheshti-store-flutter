@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../customized_libs/search_widget.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 
 class Home extends StatelessWidget {
   const Home({Key? key}) : super(key: key);
@@ -81,13 +82,52 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 class Body extends StatelessWidget {
+  var images = [
+    "assets/screens/home/banner_1.jpeg",
+    "assets/screens/home/banner_2.jpeg",
+    "assets/screens/home/banner_3.jpeg",
+    "assets/screens/home/banner_4.jpeg",
+  ];
 
   @override
   Widget build(BuildContext context) {
     return ListView(
       physics: BouncingScrollPhysics(),
       children: [
-        Text("Home screen")
+        CarouselSlider(
+          options: CarouselOptions(
+              height: 200.0,
+              autoPlay: true,
+              autoPlayInterval: Duration(seconds: 3),
+              enlargeCenterPage: true,
+
+          ),
+          items: images.map((i) {
+            return Builder(
+              builder: (BuildContext context) {
+                return Padding(
+                    padding: EdgeInsets.only(bottom: 20),
+                    child: Container(
+                        width: MediaQuery.of(context).size.width,
+                        decoration: BoxDecoration(
+                          color: Colors.amber,
+                          borderRadius: BorderRadius.all(Radius.circular(5)),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black26,
+                              spreadRadius: -10.0,
+                              blurRadius: 10.0,
+                              offset: Offset(0.0, 10.0),
+                            ),
+                          ],
+                        ),
+                        child: Image.asset(i, fit: BoxFit.cover, width: 1000),
+                    ),
+                );
+              },
+            );
+          }).toList(),
+        )
       ],
     );
   }
