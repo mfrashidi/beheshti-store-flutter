@@ -111,7 +111,7 @@ class Body extends StatelessWidget {
                         width: MediaQuery.of(context).size.width,
                         decoration: BoxDecoration(
                           color: Colors.amber,
-                          borderRadius: BorderRadius.all(Radius.circular(5)),
+                          borderRadius: BorderRadius.all(Radius.circular(7)),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black26,
@@ -121,7 +121,10 @@ class Body extends StatelessWidget {
                             ),
                           ],
                         ),
-                        child: Image.asset(i, fit: BoxFit.cover, width: 1000),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(7),
+                          child: Image.asset(i, fit: BoxFit.cover),
+                        ),
                     ),
                 );
               },
