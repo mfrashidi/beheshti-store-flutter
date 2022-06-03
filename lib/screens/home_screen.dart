@@ -273,6 +273,9 @@ class Body extends StatelessWidget {
                       crossAxisSpacing: 30,
                     ),
                     children: [
+                      new Image.asset(
+                        "assets/screens/home/best_seller/macbook.jpeg",
+                      ),
                       Stack(
                         children: [
                           Text(
@@ -280,14 +283,14 @@ class Body extends StatelessWidget {
                               style: TextStyle(
                                   fontFamily: 'Beheshti',
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 17,
+                                  fontSize: 15,
                                   color: Colors.black
                               )
                           ),
                           Align(
-                            alignment: Alignment.bottomCenter,
+                            alignment: Alignment.bottomLeft,
                             child: Container(
-                              height: 50,
+                              height: 23,
                               child: ListView(
                                 physics: NeverScrollableScrollPhysics(),
                                 shrinkWrap: true,
@@ -298,7 +301,7 @@ class Body extends StatelessWidget {
                                       style: TextStyle(
                                           fontFamily: 'Beheshti',
                                           fontWeight: FontWeight.normal,
-                                          fontSize: 22,
+                                          fontSize: 18,
                                           color: Colors.black
                                       )
                                   ),
@@ -315,10 +318,13 @@ class Body extends StatelessWidget {
                               ),
                             ),
                           ),
+                          Align(
+                              alignment: Alignment.bottomRight,
+                              child: Icon(CupertinoIcons.cart_badge_plus,
+                                size: 22,
+                                color: Color(0xFF207D4C),)
+                          )
                         ],
-                      ),
-                      new Image.asset(
-                        "assets/screens/home/best_seller/macbook.jpeg",
                       )
                     ],
                   ),
