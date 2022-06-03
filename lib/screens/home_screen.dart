@@ -44,6 +44,29 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     if (products.isEmpty) getProducts();
+
+    var images = [
+      "assets/screens/home/banner_1.jpeg",
+      "assets/screens/home/banner_2.jpeg",
+      "assets/screens/home/banner_3.jpeg",
+      "assets/screens/home/banner_4.jpeg",
+    ];
+
+    List<String> specialOffers = [
+      "26c0a9b017",
+      "53a829e24d",
+      "0e3982c7bb",
+      "e087af427e"
+    ];
+
+    List<String> newArrivals = [
+      "51d7aa3a08",
+      "0a265bf1a8",
+      "ac28f88fbc",
+      "8adfc0d358"
+    ];
+
+    String bestSeller = "a4f2e210f6";
     return Scaffold(
       appBar: AppBar(
         flexibleSpace: Padding(
@@ -97,160 +120,130 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
       ),
-      body: Body(),
-    );
-  }
-}
-class Body extends StatelessWidget {
-  var images = [
-    "assets/screens/home/banner_1.jpeg",
-    "assets/screens/home/banner_2.jpeg",
-    "assets/screens/home/banner_3.jpeg",
-    "assets/screens/home/banner_4.jpeg",
-  ];
-
-  List<String> specialOffers = [
-    "26c0a9b017",
-    "53a829e24d",
-    "0e3982c7bb",
-    "e087af427e"
-  ];
-
-  List<String> newArrivals = [
-    "51d7aa3a08",
-    "0a265bf1a8",
-    "ac28f88fbc",
-    "8adfc0d358"
-  ];
-
-  String bestSeller = "a4f2e210f6";
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimationLimiter( child: ListView(
-      physics: BouncingScrollPhysics(),
-      children: [
-        CarouselSlider(
-          options: CarouselOptions(
+      body: AnimationLimiter( child: ListView(
+        physics: BouncingScrollPhysics(),
+        children: [
+          CarouselSlider(
+            options: CarouselOptions(
               height: 200.0,
               autoPlay: true,
               autoPlayInterval: Duration(seconds: 3),
               enlargeCenterPage: true,
 
-          ),
-          items: images.map((i) {
-            return Builder(
-              builder: (BuildContext context) {
-                return Padding(
+            ),
+            items: images.map((i) {
+              return Builder(
+                builder: (BuildContext context) {
+                  return Padding(
                     padding: EdgeInsets.only(bottom: 20),
                     child: Container(
-                        width: MediaQuery.of(context).size.width,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(7)),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black26,
-                              spreadRadius: -10.0,
-                              blurRadius: 10.0,
-                              offset: Offset(0.0, 10.0),
-                            ),
-                          ],
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(7),
-                          child: Image.asset(i, fit: BoxFit.cover),
-                        ),
+                      width: MediaQuery.of(context).size.width,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(7)),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black26,
+                            spreadRadius: -10.0,
+                            blurRadius: 10.0,
+                            offset: Offset(0.0, 10.0),
+                          ),
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(7),
+                        child: Image.asset(i, fit: BoxFit.cover),
+                      ),
                     ),
-                );
-              },
-            );
-          }).toList(),
-        ),
+                  );
+                },
+              );
+            }).toList(),
+          ),
 
           Container(
-                height: 250,
-                color: Color(0xffE6123D),
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  physics: BouncingScrollPhysics(),
-                  padding: EdgeInsets.symmetric(vertical: 20),
-                  itemCount: specialOffers.length + 1,
-                  itemBuilder: (context, index) {
-                    return AnimationConfiguration.staggeredList(
-                      position: index,
-                      duration: const Duration(milliseconds: 375),
-                      child: Padding(
-                          padding: EdgeInsets.only(right: 5, left: index == specialOffers.length ? 20 : 5),
-                          child: index == 0 ?
-                          new Image.asset("assets/screens/home/special_offer/banner.png",
-                            width: 150,
-                          ) : SlideAnimation(
-                            horizontalOffset: 50.0,
-                            child: FadeInAnimation(
-                                child: Container(
-                                  width: 165,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.only(
-                                      topRight: Radius.circular(index - 1 == 0 ? 5 : 1),
-                                      topLeft: Radius.circular(index == specialOffers.length ? 5 : 1),
-                                      bottomLeft: Radius.circular(index == specialOffers.length ? 5 : 1),
-                                      bottomRight: Radius.circular(index - 1 == 0 ? 5 : 1),
-                                    ),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.2),
-                                        spreadRadius: 0,
-                                        blurRadius: 10,
-                                        offset: Offset(0, 10), // changes position of shadow
-                                      ),
-                                    ],
+            height: 250,
+            color: Color(0xffE6123D),
+            child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                physics: BouncingScrollPhysics(),
+                padding: EdgeInsets.symmetric(vertical: 20),
+                itemCount: specialOffers.length + 1,
+                itemBuilder: (context, index) {
+                  return AnimationConfiguration.staggeredList(
+                    position: index,
+                    duration: const Duration(milliseconds: 375),
+                    child: Padding(
+                        padding: EdgeInsets.only(right: 5, left: index == specialOffers.length ? 20 : 5),
+                        child: index == 0 ?
+                        new Image.asset("assets/screens/home/special_offer/banner.png",
+                          width: 150,
+                        ) : SlideAnimation(
+                          horizontalOffset: 50.0,
+                          child: FadeInAnimation(
+                              child: Container(
+                                width: 165,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.only(
+                                    topRight: Radius.circular(index - 1 == 0 ? 5 : 1),
+                                    topLeft: Radius.circular(index == specialOffers.length ? 5 : 1),
+                                    bottomLeft: Radius.circular(index == specialOffers.length ? 5 : 1),
+                                    bottomRight: Radius.circular(index - 1 == 0 ? 5 : 1),
                                   ),
-                                  padding: EdgeInsets.all(10),
-                                  child: products.isNotEmpty ? getItemCard(
-                                      products[specialOffers[index - 1]]["image"],
-                                      products[specialOffers[index - 1]]["name"],
-                                      products[specialOffers[index - 1]]["price"]) : Container()
-                                  ,
-                                )
-                            ),
-                          )),
-                    );
-                  }
-                ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.2),
+                                      spreadRadius: 0,
+                                      blurRadius: 10,
+                                      offset: Offset(0, 10), // changes position of shadow
+                                    ),
+                                  ],
+                                ),
+                                padding: EdgeInsets.all(10),
+                                child: products.isNotEmpty ? getItemCard(
+                                    products[specialOffers[index - 1]]["image"],
+                                    products[specialOffers[index - 1]]["name"],
+                                    products[specialOffers[index - 1]]["price"]) : Container()
+                                ,
+                              )
+                          ),
+                        )),
+                  );
+                }
+            ),
 
-        ),
-        Padding(
+          ),
+          Padding(
             padding: EdgeInsets.symmetric(horizontal: 25, vertical: 30),
             child: ListView(
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
               children: [
                 Padding(
-                    padding: EdgeInsets.only(bottom: 20),
-                    child: Stack(
-                      children: [
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: Text(
-                              "پرفروش‌ترین هفته",
-                              style: TextStyle(
-                                  fontFamily: 'Beheshti',
-                                  fontWeight: FontWeight.w900,
-                                  fontSize: 18,
-                                  color: Colors.black
-                              )
-                          ),
+                  padding: EdgeInsets.only(bottom: 20),
+                  child: Stack(
+                    children: [
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: Text(
+                            "پرفروش‌ترین هفته",
+                            style: TextStyle(
+                                fontFamily: 'Beheshti',
+                                fontWeight: FontWeight.w900,
+                                fontSize: 18,
+                                color: Colors.black
+                            )
                         ),
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Icon(
-                              LineIcons.award,
-                              size: 30,
-                          ),
-                        )
-                      ],
-                    ),
+                      ),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Icon(
+                          LineIcons.award,
+                          size: 30,
+                        ),
+                      )
+                    ],
+                  ),
                 ),
                 products.isNotEmpty ? Container(
                   padding: EdgeInsets.all(15),
@@ -333,8 +326,8 @@ class Body extends StatelessWidget {
                 ) : Container()
               ],
             ),
-        ),
-        Padding(
+          ),
+          Padding(
             padding: EdgeInsets.symmetric(vertical: 20),
             child: ListView(
               shrinkWrap: true,
@@ -410,9 +403,10 @@ class Body extends StatelessWidget {
                 )
               ],
             ),
-        )
-      ],
-    )
+          )
+        ],
+      )
+      ),
     );
   }
 }
