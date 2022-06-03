@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:nama_kala/assets/item_card.dart';
 import '../customized_libs/search_widget.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
 class Home extends StatelessWidget {
   const Home({Key? key}) : super(key: key);
@@ -89,6 +91,25 @@ class Body extends StatelessWidget {
     "assets/screens/home/banner_4.jpeg",
   ];
 
+  List<Map<String, dynamic>> specialOffers = [
+    {"image": "assets/screens/home/special_offer/dell.jpeg",
+      "name": "کامپیوتر همه کاره 23.8 اینچ دل مدل 5470-B",
+      "price": "۱۷,۱۶۰,۰۰۰",
+    },
+    {"image": "assets/screens/home/special_offer/book.jpeg",
+      "name": "کتاب پاستیل های بنفش اثر کاترین اپل گیت نشر آبیژ",
+      "price": "۲۱,۹۰۰",
+    },
+    {"image": "assets/screens/home/special_offer/converse.jpeg",
+      "name": "کفش راحتی کانورس مدل ALL STAR HIGH BL",
+      "price": "۸۵۵,۰۰۰",
+    },
+    {"image": "assets/screens/home/special_offer/bike.jpeg",
+      "name": "دوچرخه برقی هیمو مدل C26 SUN3658 سایز 26",
+      "price": "۴۲,۰۰۰,۰۰۰",
+    },
+  ];
+
   @override
   Widget build(BuildContext context) {
     return ListView(
@@ -130,7 +151,35 @@ class Body extends StatelessWidget {
               },
             );
           }).toList(),
-        )
+        ),
+        AnimationLimiter(
+          child: Container(
+                height: 250,
+                color: Color(0xffE6123D),
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  physics: BouncingScrollPhysics(),
+                  padding: EdgeInsets.symmetric(vertical: 20),
+                  itemCount: specialOffers.length + 1,
+                  itemBuilder: (context, index) {
+                    return AnimationConfiguration.staggeredList(
+                      position: index,
+                      duration: const Duration(milliseconds: 375),
+                          child: Padding(
+                            padding: EdgeInsets.only(right: 5, left: 5),
+                            child: index == 0 ?
+                            new Image.asset("assets/screens/home/special_offer/banner.png",
+                              width: 150,
+                            ) : SlideAnimation(
+                    horizontalOffset: 50.0,child:FadeInAnimation(child: getItemCard(specialOffers[index - 1]["image"],
+                                specialOffers[index - 1]["name"],
+                                specialOffers[index - 1]["price"])),
+                    )),
+                    );
+                  }
+                ),
+              )
+        ),
       ],
     );
   }
