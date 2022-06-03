@@ -1,0 +1,42 @@
+{
+  "26c0a9b017" : {
+    "image": "assets/screens/home/special_offer/dell.jpeg",
+    "name": "کامپیوتر همه کاره 23.8 اینچ دل مدل 5470-B",
+    "price": "۱۷,۱۶۰,۰۰۰"
+  },
+  "53a829e24d" : {
+    "image": "assets/screens/home/special_offer/book.jpeg",
+    "name": "کتاب پاستیل های بنفش اثر کاترین اپل گیت نشر آبیژ",
+    "price": "۲۱,۹۰۰"
+  },
+  "0e3982c7bb" : {
+    "image": "assets/screens/home/special_offer/converse.jpeg",
+    "name": "کفش راحتی کانورس مدل ALL STAR HIGH BL",
+    "price": "۸۵۵,۰۰۰"
+  },
+  "e087af427e" : {
+    "image": "assets/screens/home/special_offer/bike.jpeg",
+    "name": "دوچرخه برقی هیمو مدل C26 SUN3658 سایز 26",
+    "price": "۴۲,۰۰۰,۰۰۰"
+  },
+  "51d7aa3a08" : {
+    "image": "assets/screens/home/new_arrivals/canon.jpeg",
+    "name": "دوربین دیجیتال کانن مدل EOS 4000D",
+    "price": "۱۰,۹۸۸,۰۰۰"
+  },
+  "0a265bf1a8" : {
+    "image": "assets/screens/home/new_arrivals/piano.jpeg",
+    "name": "پیانو دیجیتال یاماها مدل YDP-144",
+    "price": "۴۳,۵۰۰,۰۰۰"
+  },
+  "ac28f88fbc" : {
+    "image": "assets/screens/home/new_arrivals/nike.jpeg",
+    "name": "کفش راحتی نایکی مدل COURT VISION LOW",
+    "price": "۲,۸۹۰,۰۰۰"
+  },
+  "8adfc0d358" : {
+    "image": "assets/screens/home/new_arrivals/tent.jpeg",
+    "name": "چادر مسافرتی 3 نفره پکینیو مدل K-2003",
+    "price": "۳,۱۹۵,۰۰۰"
+  }
+}
