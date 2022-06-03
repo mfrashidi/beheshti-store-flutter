@@ -74,6 +74,7 @@ flutter:
     - assets/screens/profile/
     - assets/screens/cart/
     - assets/screens/home/
+    - assets/screens/home/special_offer/
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
