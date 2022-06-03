@@ -186,7 +186,7 @@ class Body extends StatelessWidget {
                       position: index,
                       duration: const Duration(milliseconds: 375),
                       child: Padding(
-                          padding: EdgeInsets.only(right: 5, left: 5),
+                          padding: EdgeInsets.only(right: 5, left: index == specialOffers.length ? 20 : 5),
                           child: index == 0 ?
                           new Image.asset("assets/screens/home/special_offer/banner.png",
                             width: 150,
@@ -197,7 +197,12 @@ class Body extends StatelessWidget {
                                   width: 165,
                                   decoration: BoxDecoration(
                                     color: Colors.white,
-                                    borderRadius: BorderRadius.all(Radius.circular(5)),
+                                    borderRadius: BorderRadius.only(
+                                      topRight: Radius.circular(index - 1 == 0 ? 5 : 1),
+                                      topLeft: Radius.circular(index == specialOffers.length ? 5 : 1),
+                                      bottomLeft: Radius.circular(index == specialOffers.length ? 5 : 1),
+                                      bottomRight: Radius.circular(index - 1 == 0 ? 5 : 1),
+                                    ),
                                     boxShadow: [
                                       BoxShadow(
                                         color: Colors.black.withOpacity(0.2),
