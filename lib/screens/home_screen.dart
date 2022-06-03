@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:line_icons/line_icons.dart';
 import 'package:nama_kala/assets/item_card.dart';
 import '../customized_libs/search_widget.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -112,7 +114,7 @@ class Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
+    return AnimationLimiter( child: ListView(
       physics: BouncingScrollPhysics(),
       children: [
         CarouselSlider(
@@ -131,7 +133,6 @@ class Body extends StatelessWidget {
                     child: Container(
                         width: MediaQuery.of(context).size.width,
                         decoration: BoxDecoration(
-                          color: Colors.amber,
                           borderRadius: BorderRadius.all(Radius.circular(7)),
                           boxShadow: [
                             BoxShadow(
@@ -152,8 +153,8 @@ class Body extends StatelessWidget {
             );
           }).toList(),
         ),
-        AnimationLimiter(
-          child: Container(
+
+          Container(
                 height: 250,
                 color: Color(0xffE6123D),
                 child: ListView.builder(
@@ -178,9 +179,117 @@ class Body extends StatelessWidget {
                     );
                   }
                 ),
-              )
+
         ),
+        Padding(
+            padding: EdgeInsets.symmetric(horizontal: 25, vertical: 30),
+            child: ListView(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              children: [
+                Padding(
+                    padding: EdgeInsets.only(bottom: 20),
+                    child: Stack(
+                      children: [
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: Text(
+                              "پرفروش‌ترین هفته",
+                              style: TextStyle(
+                                  fontFamily: 'Beheshti',
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 18,
+                                  color: Colors.black
+                              )
+                          ),
+                        ),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Icon(
+                              LineIcons.award,
+                              size: 30,
+                          ),
+                        )
+                      ],
+                    ),
+                ),
+                Container(
+                  padding: EdgeInsets.all(15),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.all(Radius.circular(6)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        spreadRadius: 0,
+                        blurRadius: 10,
+                        offset: Offset(0, 10),
+                      ),
+                    ],
+                  ),
+                  child: GridView(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      childAspectRatio: 1,
+                      crossAxisSpacing: 30,
+                    ),
+                    children: [
+                      Stack(
+                        children: [
+                          Text(
+                              "لپ تاپ 16.2 اینچی اپل مدل MacBook Pro Mk183 2021",
+                              style: TextStyle(
+                                  fontFamily: 'Beheshti',
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 17,
+                                  color: Colors.black
+                              )
+                          ),
+                          Align(
+                            alignment: Alignment.bottomCenter,
+                            child: Container(
+                              height: 50,
+                              child: ListView(
+                                physics: NeverScrollableScrollPhysics(),
+                                shrinkWrap: true,
+                                scrollDirection: Axis.horizontal,
+                                children: [
+                                  Text(
+                                      "۷۶,۹۰۰,۰۰۰",
+                                      style: TextStyle(
+                                          fontFamily: 'Beheshti',
+                                          fontWeight: FontWeight.normal,
+                                          fontSize: 22,
+                                          color: Colors.black
+                                      )
+                                  ),
+                                  Text(
+                                      "تومان",
+                                      style: TextStyle(
+                                          fontFamily: 'Beheshti',
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 10,
+                                          color: Colors.black
+                                      )
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      new Image.asset(
+                        "assets/screens/home/best_seller/macbook.jpeg",
+                      )
+                    ],
+                  ),
+                )
+              ],
+            ),
+        )
       ],
-    );
+    ));
   }
 }
