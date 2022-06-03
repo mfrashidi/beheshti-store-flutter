@@ -123,6 +123,8 @@ class Body extends StatelessWidget {
     "8adfc0d358"
   ];
 
+  String bestSeller = "a4f2e210f6";
+
   @override
   Widget build(BuildContext context) {
     return AnimationLimiter( child: ListView(
@@ -250,7 +252,7 @@ class Body extends StatelessWidget {
                       ],
                     ),
                 ),
-                Container(
+                products.isNotEmpty ? Container(
                   padding: EdgeInsets.all(15),
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -274,12 +276,12 @@ class Body extends StatelessWidget {
                     ),
                     children: [
                       new Image.asset(
-                        "assets/screens/home/best_seller/macbook.jpeg",
+                        products[bestSeller]["image"],
                       ),
                       Stack(
                         children: [
                           Text(
-                              "لپ تاپ 16.2 اینچی اپل مدل MacBook Pro Mk183 2021",
+                              products[bestSeller]["name"],
                               style: TextStyle(
                                   fontFamily: 'Beheshti',
                                   fontWeight: FontWeight.bold,
@@ -297,7 +299,7 @@ class Body extends StatelessWidget {
                                 scrollDirection: Axis.horizontal,
                                 children: [
                                   Text(
-                                      "۷۶,۹۰۰,۰۰۰",
+                                      products[bestSeller]["price"],
                                       style: TextStyle(
                                           fontFamily: 'Beheshti',
                                           fontWeight: FontWeight.normal,
@@ -328,7 +330,7 @@ class Body extends StatelessWidget {
                       )
                     ],
                   ),
-                )
+                ) : Container()
               ],
             ),
         ),
