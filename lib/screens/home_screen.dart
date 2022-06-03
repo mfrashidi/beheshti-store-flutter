@@ -114,7 +114,7 @@ class Body extends StatelessWidget {
 
   List<Map<String, dynamic>> newArrivals = [
     {"image": "assets/screens/home/new_arrivals/canon.jpeg",
-      "name": "دوربین دیجیتال کانن مدل EOS 4000D به همراه لنز 18-55 میلی متر DC III",
+      "name": "دوربین دیجیتال کانن مدل EOS 4000D",
       "price": "۱۰,۹۸۸,۰۰۰",
     },
     {"image": "assets/screens/home/new_arrivals/piano.jpeg",
