@@ -112,6 +112,25 @@ class Body extends StatelessWidget {
     },
   ];
 
+  List<Map<String, dynamic>> newArrivals = [
+    {"image": "assets/screens/home/new_arrivals/canon.jpeg",
+      "name": "دوربین دیجیتال کانن مدل EOS 4000D به همراه لنز 18-55 میلی متر DC III",
+      "price": "۱۰,۹۸۸,۰۰۰",
+    },
+    {"image": "assets/screens/home/new_arrivals/piano.jpeg",
+      "name": "پیانو دیجیتال یاماها مدل YDP-144",
+      "price": "۴۳,۵۰۰,۰۰۰",
+    },
+    {"image": "assets/screens/home/new_arrivals/nike.jpeg",
+      "name": "کفش راحتی نایکی مدل COURT VISION LOW",
+      "price": "۲,۸۹۰,۰۰۰",
+    },
+    {"image": "assets/screens/home/new_arrivals/tent.jpeg",
+      "name": "چادر مسافرتی 3 نفره پکینیو مدل K-2003",
+      "price": "۳,۱۹۵,۰۰۰",
+    },
+  ];
+
   @override
   Widget build(BuildContext context) {
     return AnimationLimiter( child: ListView(
@@ -166,16 +185,35 @@ class Body extends StatelessWidget {
                     return AnimationConfiguration.staggeredList(
                       position: index,
                       duration: const Duration(milliseconds: 375),
-                          child: Padding(
-                            padding: EdgeInsets.only(right: 5, left: 5),
-                            child: index == 0 ?
-                            new Image.asset("assets/screens/home/special_offer/banner.png",
-                              width: 150,
-                            ) : SlideAnimation(
-                    horizontalOffset: 50.0,child:FadeInAnimation(child: getItemCard(specialOffers[index - 1]["image"],
-                                specialOffers[index - 1]["name"],
-                                specialOffers[index - 1]["price"])),
-                    )),
+                      child: Padding(
+                          padding: EdgeInsets.only(right: 5, left: 5),
+                          child: index == 0 ?
+                          new Image.asset("assets/screens/home/special_offer/banner.png",
+                            width: 150,
+                          ) : SlideAnimation(
+                            horizontalOffset: 50.0,
+                            child: FadeInAnimation(
+                                child: Container(
+                                  width: 165,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.all(Radius.circular(5)),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.2),
+                                        spreadRadius: 0,
+                                        blurRadius: 10,
+                                        offset: Offset(0, 10), // changes position of shadow
+                                      ),
+                                    ],
+                                  ),
+                                  padding: EdgeInsets.all(10),
+                                  child: getItemCard(specialOffers[index - 1]["image"],
+                                      specialOffers[index - 1]["name"],
+                                      specialOffers[index - 1]["price"]),
+                                )
+                            ),
+                          )),
                     );
                   }
                 ),
@@ -288,8 +326,85 @@ class Body extends StatelessWidget {
                 )
               ],
             ),
+        ),
+        Padding(
+            padding: EdgeInsets.symmetric(vertical: 20),
+            child: ListView(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(bottom: 20, right: 25, left: 25),
+                  child: Stack(
+                    children: [
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: Text(
+                            "کالاهای جدید",
+                            style: TextStyle(
+                                fontFamily: 'Beheshti',
+                                fontWeight: FontWeight.w900,
+                                fontSize: 18,
+                                color: Colors.black
+                            )
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Icon(
+                          LineIcons.truck,
+                          size: 30,
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+                Container(
+                  height: 250,
+                  child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      physics: BouncingScrollPhysics(),
+                      padding: EdgeInsets.symmetric(vertical: 20),
+                      itemCount: newArrivals.length,
+                      itemBuilder: (context, index) {
+                        return AnimationConfiguration.staggeredList(
+                          position: index,
+                          duration: const Duration(milliseconds: 375),
+                          child: Padding(
+                              padding: EdgeInsets.only(right: index == 0 ? 25 : 5, left: index == specialOffers.length - 1 ? 25 : 5),
+                              child: SlideAnimation(
+                                horizontalOffset: 50.0,
+                                child: FadeInAnimation(
+                                    child: Container(
+                                      width: 165,
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.all(Radius.circular(5)),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black.withOpacity(0.05),
+                                            spreadRadius: 0,
+                                            blurRadius: 10,
+                                            offset: Offset(0, 10), // changes position of shadow
+                                          ),
+                                        ],
+                                      ),
+                                      padding: EdgeInsets.all(10),
+                                      child: getItemCard(newArrivals[index]["image"],
+                                          newArrivals[index]["name"],
+                                          newArrivals[index]["price"]),
+                                    )
+                                ),
+                              )),
+                        );
+                      }
+                  ),
+                )
+              ],
+            ),
         )
       ],
-    ));
+    )
+    );
   }
 }
