@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:nama_kala/assets/item_card.dart';
+import 'package:nama_kala/screens/product_screen.dart';
 import '../customized_libs/search_widget.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
@@ -173,38 +174,43 @@ class _HomeScreenState extends State<HomeScreen> {
                     position: index,
                     duration: const Duration(milliseconds: 375),
                     child: Padding(
-                        padding: EdgeInsets.only(right: 5, left: index == specialOffers.length ? 20 : 5),
+                        padding: EdgeInsets.only(right: 5, left: index == specialOffers.length ? 30 : 5),
                         child: index == 0 ?
                         new Image.asset("assets/screens/home/special_offer/banner.png",
                           width: 150,
                         ) : SlideAnimation(
                           horizontalOffset: 50.0,
                           child: FadeInAnimation(
-                              child: Container(
-                                width: 165,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.only(
-                                    topRight: Radius.circular(index - 1 == 0 ? 5 : 1),
-                                    topLeft: Radius.circular(index == specialOffers.length ? 5 : 1),
-                                    bottomLeft: Radius.circular(index == specialOffers.length ? 5 : 1),
-                                    bottomRight: Radius.circular(index - 1 == 0 ? 5 : 1),
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.2),
-                                      spreadRadius: 0,
-                                      blurRadius: 10,
-                                      offset: Offset(0, 10), // changes position of shadow
+                              child: GestureDetector(
+                                onTap: () {
+                                  _showProductScreen(context, specialOffers[index - 1]);
+                                },
+                                child: Container(
+                                  width: 165,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.only(
+                                      topRight: Radius.circular(index - 1 == 0 ? 5 : 1),
+                                      topLeft: Radius.circular(index == specialOffers.length ? 5 : 1),
+                                      bottomLeft: Radius.circular(index == specialOffers.length ? 5 : 1),
+                                      bottomRight: Radius.circular(index - 1 == 0 ? 5 : 1),
                                     ),
-                                  ],
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.2),
+                                        spreadRadius: 0,
+                                        blurRadius: 10,
+                                        offset: Offset(0, 10), // changes position of shadow
+                                      ),
+                                    ],
+                                  ),
+                                  padding: EdgeInsets.all(10),
+                                  child: products.isNotEmpty ? getItemCard(
+                                      products[specialOffers[index - 1]]["image"],
+                                      products[specialOffers[index - 1]]["name"],
+                                      products[specialOffers[index - 1]]["price"]) : Container()
+                                  ,
                                 ),
-                                padding: EdgeInsets.all(10),
-                                child: products.isNotEmpty ? getItemCard(
-                                    products[specialOffers[index - 1]]["image"],
-                                    products[specialOffers[index - 1]]["name"],
-                                    products[specialOffers[index - 1]]["price"]) : Container()
-                                ,
                               )
                           ),
                         )),
@@ -245,85 +251,91 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ),
-                products.isNotEmpty ? Container(
-                  padding: EdgeInsets.all(15),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.all(Radius.circular(6)),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        spreadRadius: 0,
-                        blurRadius: 10,
-                        offset: Offset(0, 10),
-                      ),
-                    ],
-                  ),
-                  child: GridView(
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      childAspectRatio: 1,
-                      crossAxisSpacing: 30,
-                    ),
-                    children: [
-                      new Image.asset(
-                        products[bestSeller]["image"],
-                      ),
-                      Stack(
-                        children: [
-                          Text(
-                              products[bestSeller]["name"],
-                              style: TextStyle(
-                                  fontFamily: 'Beheshti',
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15,
-                                  color: Colors.black
-                              )
-                          ),
-                          Align(
-                            alignment: Alignment.bottomLeft,
-                            child: Container(
-                              height: 23,
-                              child: ListView(
-                                physics: NeverScrollableScrollPhysics(),
-                                shrinkWrap: true,
-                                scrollDirection: Axis.horizontal,
-                                children: [
-                                  Text(
-                                      products[bestSeller]["price"],
-                                      style: TextStyle(
-                                          fontFamily: 'Beheshti',
-                                          fontWeight: FontWeight.normal,
-                                          fontSize: 18,
-                                          color: Colors.black
-                                      )
-                                  ),
-                                  Text(
-                                      "تومان",
-                                      style: TextStyle(
-                                          fontFamily: 'Beheshti',
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 10,
-                                          color: Colors.black
-                                      )
-                                  ),
-                                ],
-                              ),
+                products.isNotEmpty ?
+                    GestureDetector(
+                      onTap: () {
+                        _showProductScreen(context, bestSeller);
+                      },
+                      child: Container(
+                        padding: EdgeInsets.all(15),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.all(Radius.circular(6)),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              spreadRadius: 0,
+                              blurRadius: 10,
+                              offset: Offset(0, 10),
                             ),
+                          ],
+                        ),
+                        child: GridView(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            childAspectRatio: 1,
+                            crossAxisSpacing: 30,
                           ),
-                          Align(
-                              alignment: Alignment.bottomRight,
-                              child: Icon(CupertinoIcons.cart_badge_plus,
-                                size: 22,
-                                color: Color(0xFF207D4C),)
-                          )
-                        ],
-                      )
-                    ],
-                  ),
-                ) : Container()
+                          children: [
+                            new Image.asset(
+                              products[bestSeller]["image"],
+                            ),
+                            Stack(
+                              children: [
+                                Text(
+                                    products[bestSeller]["name"],
+                                    style: TextStyle(
+                                        fontFamily: 'Beheshti',
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 15,
+                                        color: Colors.black
+                                    )
+                                ),
+                                Align(
+                                  alignment: Alignment.bottomLeft,
+                                  child: Container(
+                                    height: 23,
+                                    child: ListView(
+                                      physics: NeverScrollableScrollPhysics(),
+                                      shrinkWrap: true,
+                                      scrollDirection: Axis.horizontal,
+                                      children: [
+                                        Text(
+                                            products[bestSeller]["price"],
+                                            style: TextStyle(
+                                                fontFamily: 'Beheshti',
+                                                fontWeight: FontWeight.normal,
+                                                fontSize: 18,
+                                                color: Colors.black
+                                            )
+                                        ),
+                                        Text(
+                                            "تومان",
+                                            style: TextStyle(
+                                                fontFamily: 'Beheshti',
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 10,
+                                                color: Colors.black
+                                            )
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                Align(
+                                    alignment: Alignment.bottomRight,
+                                    child: Icon(CupertinoIcons.cart_badge_plus,
+                                      size: 22,
+                                      color: Color(0xFF207D4C),)
+                                )
+                              ],
+                            )
+                          ],
+                        ),
+                      ),
+                    ) : Container()
               ],
             ),
           ),
@@ -375,25 +387,30 @@ class _HomeScreenState extends State<HomeScreen> {
                               child: SlideAnimation(
                                 horizontalOffset: 50.0,
                                 child: FadeInAnimation(
-                                    child: Container(
-                                      width: 165,
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.all(Radius.circular(5)),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.black.withOpacity(0.05),
-                                            spreadRadius: 0,
-                                            blurRadius: 10,
-                                            offset: Offset(0, 10), // changes position of shadow
-                                          ),
-                                        ],
+                                    child: GestureDetector(
+                                    onTap: () {
+                                    _showProductScreen(context, newArrivals[index]);
+                                    },
+                                      child: Container(
+                                        width: 165,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.all(Radius.circular(5)),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withOpacity(0.05),
+                                              spreadRadius: 0,
+                                              blurRadius: 10,
+                                              offset: Offset(0, 10), // changes position of shadow
+                                            ),
+                                          ],
+                                        ),
+                                        padding: EdgeInsets.all(10),
+                                        child: products.isNotEmpty ? getItemCard(
+                                            products[newArrivals[index]]["image"],
+                                            products[newArrivals[index]]["name"],
+                                            products[newArrivals[index]]["price"]) : Container(),
                                       ),
-                                      padding: EdgeInsets.all(10),
-                                      child: products.isNotEmpty ? getItemCard(
-                                          products[newArrivals[index]]["image"],
-                                          products[newArrivals[index]]["name"],
-                                          products[newArrivals[index]]["price"]) : Container(),
                                     )
                                 ),
                               )),
@@ -408,5 +425,9 @@ class _HomeScreenState extends State<HomeScreen> {
       )
       ),
     );
+  }
+
+  void _showProductScreen(BuildContext context, String id) {
+    Navigator.of(context).push(CupertinoPageRoute(builder: (context) => ProductScreen(id)));
   }
 }
