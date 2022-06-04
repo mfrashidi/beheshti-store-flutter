@@ -1,47 +1,237 @@
 {
   "26c0a9b017" : {
     "image": "assets/screens/home/special_offer/dell.jpeg",
+    "images_count": 8,
+    "category": "کالای دیجیتال",
+    "sub_category": "لپ تاپ",
+    "star": 4,
+    "has_color": true,
+    "colors": [
+      {
+        "name": "مشکی",
+        "code": "0xff000000"
+      },
+      {
+        "name": "نقره‌ای",
+        "code": "0xffc7c7c7"
+      }
+    ],
+    "description" : {
+      "سری پردازنده" : "Celeron",
+      "ظرفیت حافظه RAM" : "۸ گیگابایت",
+      "حافظه اختصاصی کارت گرافیک" : "بدون حافظه اختصاصی مجزا",
+      "دقت صفحه نمایش" : "1080 × 1920 پیکسل - Full HD",
+      "اندازه صفحه نمایش" : "۲۳.۸ اینچ"
+    },
+    "seller": "کامپیوتر ایران",
+    "has_size": false,
     "name": "کامپیوتر همه کاره 23.8 اینچ دل مدل 5470-B",
     "price": "۱۷,۱۶۰,۰۰۰"
   },
   "53a829e24d" : {
     "image": "assets/screens/home/special_offer/book.jpeg",
     "name": "کتاب پاستیل های بنفش اثر کاترین اپل گیت نشر آبیژ",
+    "images_count": 2,
+    "category": "کتاب و لوازم التحریر",
+    "sub_category": "کتاب",
+    "star": 3,
+    "has_color": false,
+    "description" : {
+      "رده بندی کتاب" : "ادبیات آمریکا (شعر و ادبیات)",
+      "قطع" : "رقعی",
+      "نوع جلد" : "شومیز",
+      "جوایز ادبی" : "گودریدز",
+      "زبان نوشتار" : "فارسی"
+    },
+    "seller": "نشر آبیژ",
+    "has_size": false,
     "price": "۲۱,۹۰۰"
   },
   "0e3982c7bb" : {
     "image": "assets/screens/home/special_offer/converse.jpeg",
+    "images_count": 6,
+    "category": "ورزش و سفر",
+    "sub_category": "پوشاک ورزشی",
+    "star": 5,
+    "has_color": true,
+    "colors": [
+      {
+        "name": "سرمه‌ای",
+        "code": "0xff1f4678"
+      },
+      {
+        "name": "قرمز",
+        "code": "0xffbf1f1f"
+      },
+      {
+        "name": "مشکی",
+        "code": "0xff000000"
+      }
+    ],
+    "has_size": true,
+    "sizes": ["۴۴", "۴۴.۵", "۴۶"],
+    "description" : {
+      "جنس" : "برزنت",
+      "جنس زیره" : "ترموپلاستیک",
+      "نحوه بسته شدن کفش" : "بندی",
+      "ارتفاع ساق" : "مچ پا",
+      "ویژگی‌های تخصصی کفش" : "کاهش فشارهای وارده"
+    },
+    "seller": "کانورس ایران",
     "name": "کفش راحتی کانورس مدل ALL STAR HIGH BL",
     "price": "۸۵۵,۰۰۰"
   },
   "e087af427e" : {
     "image": "assets/screens/home/special_offer/bike.jpeg",
+    "images_count": 3,
+    "category": "ورزش و سفر",
+    "sub_category": "لوازم ورزشی",
+    "star": 4,
+    "has_color": false,
+    "description" : {
+      "سایز طوقه" : "۲۶ اینچ",
+      "جنس فریم" : "آلومینیوم",
+      "شامل" : "دستگیره",
+      "نوع ترمز" : "دیکسی مکانیکی"
+    },
+    "seller": "سانتک",
+    "has_size": true,
+    "sizes": ["۲۶"],
     "name": "دوچرخه برقی هیمو مدل C26 SUN3658 سایز 26",
     "price": "۴۲,۰۰۰,۰۰۰"
   },
   "51d7aa3a08" : {
     "image": "assets/screens/home/new_arrivals/canon.jpeg",
+    "images_count": 5,
+    "category": "کالای دیجیتال",
+    "sub_category": "دوربین",
+    "star": 4,
+    "has_color": true,
+    "colors": [
+      {
+        "name": "مشکی",
+        "code": "0xff000000"
+      }
+    ],
+    "description" : {
+      "محدوده دقت حسگر" : "۱۵ تا ۲۰ مگاپیکسل",
+      "نوع حسگر" : "CMOS",
+      "قطع حسگر" : "Crop Frame",
+      "محدوده زوم" : "۳ تا ۶ برابر بزرگنمایی",
+      "رزولوشن فیلم" : "Full HD"
+    },
+    "seller": "دیدنما",
+    "has_size": false,
     "name": "دوربین دیجیتال کانن مدل EOS 4000D",
     "price": "۱۰,۹۸۸,۰۰۰"
   },
   "0a265bf1a8" : {
     "image": "assets/screens/home/new_arrivals/piano.jpeg",
     "name": "پیانو دیجیتال یاماها مدل YDP-144",
+    "images_count": 4,
+    "category": "كتاب و لوازم التحرير",
+    "sub_category": "موسیقی",
+    "star": 4,
+    "has_color": true,
+    "colors": [
+      {
+        "name": "سفید",
+        "code": "0xffffffff"
+      }
+    ],
+    "description" : {
+      "استایل" : "دیواری",
+      "تعداد اکتاو" : "هفت",
+      "نوع کلاویه" : "Graded Hammer Action",
+      "جنس کلاویه ها" : "عاج مصنوعی",
+      "تعداد پدال" : "سه"
+    },
+    "seller": "ایران ملودیک",
+    "has_size": false,
     "price": "۴۳,۵۰۰,۰۰۰"
   },
   "ac28f88fbc" : {
     "image": "assets/screens/home/new_arrivals/nike.jpeg",
     "name": "کفش راحتی نایکی مدل COURT VISION LOW",
+    "images_count": 6,
+    "category": "پوشاک",
+    "sub_category": "مردانه",
+    "star": 4,
+    "has_color": true,
+    "colors": [
+      {
+        "name": "مشکی",
+        "code": "0xff000000"
+      }
+    ],
+    "description" : {
+      "جنس زیره" : "ترموپلاستیک",
+      "نحوه بسته شدن کفش" : "بندی",
+      "ارتفاع ساق" : "مج پا",
+      "ویژگی های تخصصی کفش" : "مقاوم در برابر سایش",
+      "ویژگی‌های زیره" : "کاهش فشار وارده"
+    },
+    "seller": "کفش آسیا",
+    "has_size": true,
+    "sizes": ["۳۹", "۴۳", "۴۴", "۴۴.۵"],
     "price": "۲,۸۹۰,۰۰۰"
   },
   "8adfc0d358" : {
     "image": "assets/screens/home/new_arrivals/tent.jpeg",
     "name": "چادر مسافرتی 3 نفره پکینیو مدل K-2003",
+    "images_count": 6,
+    "category": "ورزش و سفر",
+    "sub_category": "لوازم سفر و کمپینگ",
+    "star": 3,
+    "has_color": true,
+    "colors": [
+      {
+        "name": "قرمز",
+        "code": "0xfff44336"
+      },
+      {
+        "name": "آبی",
+        "code": "0xff2194f3"
+      },
+      {
+        "name": "نارنجی",
+        "code": "0xffff5622"
+      }
+    ],
+    "description" : {
+      "ستون بندی" : "آلومینیوم",
+      "جنس پارچه" : "پلی‌استر",
+      "سیستم گردش هوا" : "پنجره",
+      "تعداد هواکش" : "دو عدد",
+      "تعداد در" : "دو عدد"
+    },
+    "seller": "پخش دلنیا",
+    "has_size": false,
     "price": "۳,۱۹۵,۰۰۰"
   },
   "a4f2e210f6" : {
     "image": "assets/screens/home/best_seller/macbook.jpeg",
     "name": "لپ تاپ 16.2 اینچی اپل مدل MacBook Pro Mk183 2021",
+    "images_count": 6,
+    "category": "کالای دیجیتال",
+    "sub_category": "لپ تاپ",
+    "star": 5,
+    "has_color": true,
+    "colors": [
+      {
+        "name": "خاکستری",
+        "code": "0xff9e9e9e"
+      }
+    ],
+    "description" : {
+      "سری پردانزده" : "M1",
+      "ظرفیت حافظه رم" : "۱۶ گیگابایت",
+      "نوع حافظه رم" : "Unified",
+      "سازنده پردازنده گرافیکی" : "Apple",
+      "اندازه صفحه نمایش" : "۱۶.۲ اینچ"
+    },
+    "seller": "رایاتک",
+    "has_size": false,
     "price": "۷۶,۹۰۰,۰۰۰"
   }
 }
