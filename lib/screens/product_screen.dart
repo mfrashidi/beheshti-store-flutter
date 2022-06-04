@@ -335,7 +335,7 @@ class _ProductScreenState extends State<ProductScreen> with TickerProviderStateM
 
   Widget _detailWidget() {
     return DraggableScrollableSheet(
-      maxChildSize: .8,
+      maxChildSize: .75,
       initialChildSize: .53,
       minChildSize: .53,
       builder: (context, scrollController) {
