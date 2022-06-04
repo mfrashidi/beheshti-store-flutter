@@ -5,6 +5,7 @@ import 'package:line_icons/line_icons.dart';
 import 'package:nama_kala/screens/addresses_screen.dart';
 import 'package:nama_kala/screens/favorites_screen.dart';
 import 'package:nama_kala/screens/my_products.dart';
+import 'package:nama_kala/screens/orders_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen();
@@ -221,7 +222,12 @@ class Body extends StatelessWidget {
                 Navigator.of(context).push(CupertinoPageRoute(builder: (context) => MyProductScreen()));
               },
             ),
-              _boxWidget(statistics[1]["text"], statistics[1]["number"], statistics[1]["logo"]),
+            GestureDetector(
+              child: _boxWidget(statistics[1]["text"], statistics[1]["number"], statistics[1]["logo"]),
+              onTap: () {
+                Navigator.of(context).push(CupertinoPageRoute(builder: (context) => OrdersScreen()));
+              },
+            )
           ],
         ),
         ListView.builder(
