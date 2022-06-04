@@ -4,6 +4,7 @@
     "images_count": 8,
     "category": "کالای دیجیتال",
     "sub_category": "لپ تاپ",
+    "category_id": "DIGITAL_LAPTOP",
     "star": 4,
     "has_color": true,
     "colors": [
@@ -34,6 +35,7 @@
     "images_count": 2,
     "category": "کتاب و لوازم التحریر",
     "sub_category": "کتاب",
+    "category_id": "BOOKS_BOOK",
     "star": 3,
     "has_color": false,
     "description" : {
@@ -52,6 +54,7 @@
     "images_count": 6,
     "category": "ورزش و سفر",
     "sub_category": "پوشاک ورزشی",
+    "category_id": "SPORT_CLOTHING",
     "star": 5,
     "has_color": true,
     "colors": [
@@ -86,6 +89,7 @@
     "images_count": 3,
     "category": "ورزش و سفر",
     "sub_category": "لوازم ورزشی",
+    "category_id": "SPORT_GOODS",
     "star": 4,
     "has_color": false,
     "description" : {
@@ -105,6 +109,7 @@
     "images_count": 5,
     "category": "کالای دیجیتال",
     "sub_category": "دوربین",
+    "category_id": "DIGITAL_CAMERA",
     "star": 4,
     "has_color": true,
     "colors": [
@@ -131,6 +136,7 @@
     "images_count": 4,
     "category": "كتاب و لوازم التحرير",
     "sub_category": "موسیقی",
+    "category_id": "BOOKS_MUSIC",
     "star": 4,
     "has_color": true,
     "colors": [
@@ -156,6 +162,7 @@
     "images_count": 6,
     "category": "پوشاک",
     "sub_category": "مردانه",
+    "category_id": "CLOTHING_MEN",
     "star": 4,
     "has_color": true,
     "colors": [
@@ -182,6 +189,7 @@
     "images_count": 6,
     "category": "ورزش و سفر",
     "sub_category": "لوازم سفر و کمپینگ",
+    "category_id": "SPORT_CAMPING",
     "star": 3,
     "has_color": true,
     "colors": [
@@ -215,6 +223,7 @@
     "images_count": 6,
     "category": "کالای دیجیتال",
     "sub_category": "لپ تاپ",
+    "category_id": "DIGITAL_LAPTOP",
     "star": 5,
     "has_color": true,
     "colors": [

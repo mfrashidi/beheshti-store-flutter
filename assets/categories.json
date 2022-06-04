@@ -8,13 +8,16 @@
     "image_width": 125.0,
     "sub_categories": {
       "PHONE": {
-        "name": "موبایل"
+        "name": "موبایل",
+        "icon": "mobilePhone"
       },
       "LAPTOP": {
-        "name": "لپ تاپ"
+        "name": "لپ تاپ",
+        "icon": "laptop"
       },
       "CAMERA": {
-        "name": "دوربین"
+        "name": "دوربین",
+        "icon": "camera"
       }
     }
   },
@@ -27,13 +30,16 @@
     "image_width": 100.0,
     "sub_categories": {
       "WOMEN": {
-        "name": "زنانه"
+        "name": "زنانه",
+        "icon": "female"
       },
       "MEN": {
-        "name": "مردانه"
+        "name": "مردانه",
+        "icon": "male"
       },
       "CHILD": {
-        "name": "بچگانه"
+        "name": "بچگانه",
+        "icon": "child"
       }
     }
   },
@@ -46,16 +52,20 @@
     "image_width": 100.0,
     "sub_categories": {
       "BOOK": {
-        "name": "کتاب"
+        "name": "کتاب",
+        "icon": "book"
       },
       "STATIONERY": {
-        "name": "لوازم التحریر"
+        "name": "لوازم التحریر",
+        "icon": "pen"
       },
       "MUSIC": {
-        "name": "موسیقی"
+        "name": "موسیقی",
+        "icon": "guitar"
       },
       "HANDICRAFTS": {
-        "name": "صنایع دستی"
+        "name": "صنایع دستی",
+        "icon": "wrench"
       }
     }
   },
@@ -68,13 +78,16 @@
     "image_width": 100.0,
     "sub_categories": {
       "CLOTHING": {
-        "name": "پوشاک ورزشی"
+        "name": "پوشاک ورزشی",
+        "icon": "running"
       },
       "GOODS": {
-        "name": "لوازم ورزشی"
+        "name": "لوازم ورزشی",
+        "icon": "volleyballBall"
       },
       "CAMPING": {
-        "name": "لوازم سفر و کمپینگ"
+        "name": "لوازم سفر و کمپینگ",
+        "icon": "campground"
       }
     }
   }
