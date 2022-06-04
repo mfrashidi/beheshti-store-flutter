@@ -37,6 +37,7 @@ dependencies:
   glassmorphism: any
   anim_search_bar: ^2.0.2
   carousel_slider: ^4.1.1
+  fluttertoast: ^8.0.8
   flutter:
     sdk: flutter
 
@@ -70,6 +71,7 @@ flutter:
         - asset: assets/fonts/Beheshti-Black.woff
   assets:
     - assets/
+    - assets/products/
     - assets/screens/categories/
     - assets/screens/profile/
     - assets/screens/cart/
