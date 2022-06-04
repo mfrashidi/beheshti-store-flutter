@@ -188,7 +188,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-            "علاقه‌مندی های من",
+            "علاقه‌مندی ها",
             style: TextStyle(
                 fontFamily: 'Beheshti',
                 fontWeight: FontWeight.bold,
