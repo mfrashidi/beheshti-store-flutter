@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:line_icons/line_icons.dart';
+import 'package:nama_kala/screens/addresses_screen.dart';
 import 'package:nama_kala/screens/favorites_screen.dart';
 import 'package:nama_kala/screens/my_products.dart';
 
@@ -198,7 +199,7 @@ class Body extends StatelessWidget {
       FavoritesScreen(),
       FavoritesScreen(),
       FavoritesScreen(),
-      FavoritesScreen(),
+      AddressesScreen(),
     ];
     return ListView(
       physics: BouncingScrollPhysics(),
