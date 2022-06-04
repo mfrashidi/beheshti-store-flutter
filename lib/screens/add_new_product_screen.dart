@@ -133,7 +133,7 @@ class _AddNewProductScreenState extends State<AddNewProductScreen> {
     );
   }
 
-  Widget _attribureWidget(String k, String? v) {
+  Widget _attributeWidget(String k, String? v) {
     return Stack(
       children: [
         Align(
@@ -554,7 +554,7 @@ class _AddNewProductScreenState extends State<AddNewProductScreen> {
           itemCount: attributes.length,
           shrinkWrap: true,
           itemBuilder: (context, index) {
-            return _attribureWidget(keys[index], attributes[keys[index]]);
+            return _attributeWidget(keys[index], attributes[keys[index]]);
           }
           )
       ],
