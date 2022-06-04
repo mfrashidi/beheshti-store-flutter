@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:line_icons/line_icons.dart';
+import 'package:nama_kala/screens/favorites_screen.dart';
 import 'package:nama_kala/screens/my_products.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -125,6 +126,48 @@ class Body extends StatelessWidget {
     );
   }
 
+  Widget _settingsWidget(String text, String logo) {
+    return Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              spreadRadius: 0,
+              blurRadius: 10,
+              offset: Offset(0, 7), // changes position of shadow
+            ),
+          ],
+        ),
+        margin: EdgeInsets.only(bottom: 20),
+        padding: EdgeInsets.all(15),
+        child: Stack(
+          children: [
+            Align(
+              alignment: Alignment.centerRight,
+              child: Text(
+                  text,
+                  style: TextStyle(
+                      fontFamily: 'Beheshti',
+                      fontWeight: FontWeight.normal,
+                      fontSize: 17,
+                      color: Colors.black
+                  )
+              ),
+            ),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Image.asset(
+                logo,
+                width: 25,
+              ),
+            )
+          ],
+        )
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     List<Map<String, dynamic>> statistics = [
@@ -150,6 +193,12 @@ class Body extends StatelessWidget {
       {"logo": "assets/screens/profile/address.png",
         "text": "آدرس ها",
       },
+    ];
+    List<StatefulWidget> settingsScreen = [
+      FavoritesScreen(),
+      FavoritesScreen(),
+      FavoritesScreen(),
+      FavoritesScreen(),
     ];
     return ListView(
       physics: BouncingScrollPhysics(),
@@ -185,44 +234,11 @@ class Body extends StatelessWidget {
               child: SlideAnimation(
                 verticalOffset: -50.0,
                 child: FadeInAnimation(
-                  child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.04),
-                            spreadRadius: 0,
-                            blurRadius: 10,
-                            offset: Offset(0, 7), // changes position of shadow
-                          ),
-                        ],
-                      ),
-                      margin: EdgeInsets.only(bottom: 20),
-                      padding: EdgeInsets.all(15),
-                      child: Stack(
-                        children: [
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: Text(
-                                settings[index]["text"],
-                                style: TextStyle(
-                                    fontFamily: 'Beheshti',
-                                    fontWeight: FontWeight.normal,
-                                    fontSize: 17,
-                                    color: Colors.black
-                                )
-                            ),
-                          ),
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Image.asset(
-                              settings[index]["logo"],
-                              width: 25,
-                            ),
-                          )
-                        ],
-                      )
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).push(CupertinoPageRoute(builder: (context) => settingsScreen[index]));
+                    },
+                    child: _settingsWidget(settings[index]["text"], settings[index]["logo"]),
                   ),
                 ),
               ),
