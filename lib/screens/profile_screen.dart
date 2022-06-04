@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:line_icons/line_icons.dart';
+import 'package:nama_kala/screens/my_products.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen();
@@ -85,6 +86,45 @@ class ProfileScreen extends StatelessWidget {
 class Body extends StatelessWidget {
   const Body({Key? key}) : super(key: key);
 
+  Widget _boxWidget(String text, String number, String logo) {
+    return Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              spreadRadius: 0,
+              blurRadius: 10,
+              offset: Offset(0, 7), // changes position of shadow
+            ),
+          ],
+        ),
+        child:
+        Row(
+          children: [
+            Padding(
+              padding: EdgeInsets.only(right: 15, left: 10),
+              child: Image.asset(logo, width: 40),
+            ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                    text,
+                    style: TextStyle(fontFamily: 'Beheshti', fontWeight: FontWeight.normal, fontSize: 15)
+                ),
+                Text(
+                    number,
+                    style: TextStyle(fontFamily: 'Beheshti', fontWeight: FontWeight.bold, fontSize: 15)
+                )
+              ],
+            )
+          ],
+        )
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     List<Map<String, dynamic>> statistics = [
@@ -114,7 +154,7 @@ class Body extends StatelessWidget {
     return ListView(
       physics: BouncingScrollPhysics(),
       children: [
-        GridView.builder(
+        GridView(
           physics: BouncingScrollPhysics(),
           padding: EdgeInsets.only(bottom: 30),
           shrinkWrap: true,
@@ -124,53 +164,15 @@ class Body extends StatelessWidget {
             crossAxisSpacing: 30,
             mainAxisSpacing: 30,
           ),
-          itemCount: statistics.length,
-          itemBuilder: (context, index) {
-            return AnimationConfiguration.staggeredList(
-              position: index,
-              duration: const Duration(milliseconds: 375),
-              child: FadeInAnimation(
-                child: FadeInAnimation(
-                  child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.04),
-                            spreadRadius: 0,
-                            blurRadius: 10,
-                            offset: Offset(0, 7), // changes position of shadow
-                          ),
-                        ],
-                      ),
-                      child:
-                          Row(
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.only(right: 15, left: 10),
-                                child: Image.asset(statistics[index]["logo"], width: 40),
-                              ),
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                      statistics[index]["text"],
-                                      style: TextStyle(fontFamily: 'Beheshti', fontWeight: FontWeight.normal, fontSize: 15)
-                                  ),
-                                  Text(
-                                      statistics[index]["number"],
-                                      style: TextStyle(fontFamily: 'Beheshti', fontWeight: FontWeight.bold, fontSize: 15)
-                                  )
-                                ],
-                              )
-                            ],
-                          )
-                  ),
-                ),
-              ),
-            );
-          },
+          children: [
+            GestureDetector(
+              child: _boxWidget(statistics[0]["text"], statistics[0]["number"], statistics[0]["logo"]),
+              onTap: () {
+                Navigator.of(context).push(CupertinoPageRoute(builder: (context) => MyProductScreen()));
+              },
+            ),
+              _boxWidget(statistics[1]["text"], statistics[1]["number"], statistics[1]["logo"]),
+          ],
         ),
         ListView.builder(
           shrinkWrap: true,
