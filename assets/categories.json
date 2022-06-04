@@ -1,0 +1,81 @@
+{
+  "DIGITAL": {
+    "name": "کالای دیجیتال",
+    "color": "0x9CA2F0FF",
+    "image": "assets/screens/categories/Macbook.png",
+    "has_fade_image": false,
+    "image_padding": 30.0,
+    "image_width": 125.0,
+    "sub_categories": {
+      "PHONE": {
+        "name": "موبایل"
+      },
+      "LAPTOP": {
+        "name": "لپ تاپ"
+      },
+      "CAMERA": {
+        "name": "دوربین"
+      }
+    }
+  },
+  "CLOTHING": {
+    "name": "پوشاک",
+    "color": "0xFFFFA0A0",
+    "image": "assets/screens/categories/clothing.png",
+    "has_fade_image": true,
+    "image_padding": 10.0,
+    "image_width": 100.0,
+    "sub_categories": {
+      "WOMEN": {
+        "name": "زنانه"
+      },
+      "MEN": {
+        "name": "مردانه"
+      },
+      "CHILD": {
+        "name": "بچگانه"
+      }
+    }
+  },
+  "BOOKS": {
+    "name": "کتاب و لوازم التحریر",
+    "color": "0xA2F0FF9C",
+    "image": "assets/screens/categories/Books.png",
+    "has_fade_image": false,
+    "image_padding": 20.0,
+    "image_width": 100.0,
+    "sub_categories": {
+      "BOOK": {
+        "name": "کتاب"
+      },
+      "STATIONERY": {
+        "name": "لوازم التحریر"
+      },
+      "MUSIC": {
+        "name": "موسیقی"
+      },
+      "HANDICRAFTS": {
+        "name": "صنایع دستی"
+      }
+    }
+  },
+  "SPORT": {
+    "name": "ورزش و سفر",
+    "color": "0xA2A7FFC4",
+    "image": "assets/screens/categories/Tent.png",
+    "has_fade_image": false,
+    "image_padding": 5.0,
+    "image_width": 100.0,
+    "sub_categories": {
+      "CLOTHING": {
+        "name": "پوشاک ورزشی"
+      },
+      "GOODS": {
+        "name": "لوازم ورزشی"
+      },
+      "CAMPING": {
+        "name": "لوازم سفر و کمپینگ"
+      }
+    }
+  }
+}
