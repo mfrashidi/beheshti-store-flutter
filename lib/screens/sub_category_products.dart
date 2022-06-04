@@ -65,7 +65,7 @@ class _SubCategoryScreenState extends State<SubCategoryScreen> {
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Padding(
-                  padding: EdgeInsets.only(left: 15),
+                  padding: EdgeInsets.only(left: 20),
                   child: Icon(LineIcons.byName(subCategory["icon"]), size: 30),
                 ),
               ),
