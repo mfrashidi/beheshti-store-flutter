@@ -98,10 +98,6 @@ class _CartScreenState extends State<CartScreen> {
               child: SlideAnimation(
                 verticalOffset: -50.0,
                 child: FadeInAnimation(
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.of(context).push(CupertinoPageRoute(builder: (context) => ProductScreen(items[index])));
-                    },
                     child: Container(
                     padding: EdgeInsets.all(10),
                     decoration: BoxDecoration(
@@ -126,7 +122,12 @@ class _CartScreenState extends State<CartScreen> {
                         mainAxisSpacing: 30,
                       ),
                       children: [
-                        new Image.asset(product["image"]),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).push(CupertinoPageRoute(builder: (context) => ProductScreen(items[index])));
+                          },
+                          child: new Image.asset(product["image"]),
+                        ),
                         Stack(
                           children: [
                             Align(
@@ -310,7 +311,6 @@ class _CartScreenState extends State<CartScreen> {
                   )
           ),
                 ),
-              )
           );
         }
     )
