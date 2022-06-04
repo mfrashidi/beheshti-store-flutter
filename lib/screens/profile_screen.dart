@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:nama_kala/screens/addresses_screen.dart';
+import 'package:nama_kala/screens/edit_profile_screen.dart';
 import 'package:nama_kala/screens/favorites_screen.dart';
 import 'package:nama_kala/screens/my_products.dart';
 import 'package:nama_kala/screens/orders_screen.dart';
@@ -197,7 +198,7 @@ class Body extends StatelessWidget {
       },
     ];
     List<StatefulWidget> settingsScreen = [
-      FavoritesScreen(),
+      EditProfileScreen(),
       FavoritesScreen(),
       FavoritesScreen(),
       AddressesScreen(),
