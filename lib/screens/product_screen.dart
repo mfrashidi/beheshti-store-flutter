@@ -47,6 +47,7 @@ class _ProductScreenState extends State<ProductScreen> with TickerProviderStateM
     super.initState();
     colorIndex = 0;
     sizeIndex = 0;
+    heart = LineIcons.heart;
     _getProducts();
   }
 
@@ -548,7 +549,7 @@ class _ProductScreenState extends State<ProductScreen> with TickerProviderStateM
     return Scaffold(
         appBar: AppBar(
           elevation: 0,
-          toolbarHeight: 80,
+          toolbarHeight: 120,
           leading: Container(),
           flexibleSpace: Padding(
             padding: EdgeInsets.symmetric(horizontal: 20),

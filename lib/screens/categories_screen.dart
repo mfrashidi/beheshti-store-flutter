@@ -1,10 +1,14 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
+import 'category_screen.dart';
+
 List<Map<String, dynamic>> categories = [];
+List<String> categoryNames = [];
 
 class CategoriesScreen extends StatefulWidget {
   const CategoriesScreen({Key? key}) : super(key: key);
@@ -39,6 +43,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     setState(() {
       Map<String, dynamic> categoriesMap = data;
       categoriesMap.forEach((key, value) {
+        categoryNames.add(key);
         categories.add(value);
       });
     });
@@ -72,46 +77,51 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                   child: SlideAnimation(
                     verticalOffset: -50.0,
                     child: FadeInAnimation(
-                      child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.all(Radius.circular(5)),
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [
-                                Color(int.parse(categories[index]["color"])),
-                                Colors.white.withOpacity(0.25),
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).push(CupertinoPageRoute(builder: (context) => CategoryScreen(categoryNames[index])));
+                        },
+                        child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.all(Radius.circular(5)),
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Color(int.parse(categories[index]["color"])),
+                                  Colors.white.withOpacity(0.25),
+                                ],
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  blurRadius: 10,
+                                  color: Colors.black.withOpacity(.1),
+                                )
                               ],
                             ),
-                            boxShadow: [
-                              BoxShadow(
-                                blurRadius: 10,
-                                color: Colors.black.withOpacity(.1),
-                              )
-                            ],
-                          ),
-                          child:
-                          Stack(
-                            children: <Widget>[
-                              Align(
-                                alignment: Alignment.topCenter,
-                                child: Padding(
-                                  padding: EdgeInsets.only(top: categories[index]["image_padding"]),
-                                  child: categories[index]["has_fade_image"] ? fadeImage(categories[index]["image"]) : Image.asset(categories[index]["image"], width: categories[index]["image_width"]),
+                            child:
+                            Stack(
+                              children: <Widget>[
+                                Align(
+                                  alignment: Alignment.topCenter,
+                                  child: Padding(
+                                    padding: EdgeInsets.only(top: categories[index]["image_padding"]),
+                                    child: categories[index]["has_fade_image"] ? fadeImage(categories[index]["image"]) : Image.asset(categories[index]["image"], width: categories[index]["image_width"]),
+                                  ),
                                 ),
-                              ),
-                              Align(
-                                alignment: Alignment.bottomCenter,
-                                child: Padding(
-                                    padding: const EdgeInsets.only(bottom: 20),
-                                    child: Text(
-                                        categories[index]["name"],
-                                        style: TextStyle(fontFamily: 'Beheshti', fontWeight: FontWeight.bold, fontSize: 15)
-                                    )
-                                ),
-                              )
-                            ],
-                          )
+                                Align(
+                                  alignment: Alignment.bottomCenter,
+                                  child: Padding(
+                                      padding: const EdgeInsets.only(bottom: 20),
+                                      child: Text(
+                                          categories[index]["name"],
+                                          style: TextStyle(fontFamily: 'Beheshti', fontWeight: FontWeight.bold, fontSize: 15)
+                                      )
+                                  ),
+                                )
+                              ],
+                            )
+                        ),
                       ),
                     ),
                   ),
