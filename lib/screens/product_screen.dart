@@ -7,6 +7,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:line_icons/line_icons.dart';
+import 'package:nama_kala/screens/category_screen.dart';
+import 'package:nama_kala/screens/sub_category_products.dart';
 
 String productId = "";
 Map<String, dynamic> product = {};
@@ -383,27 +385,36 @@ class _ProductScreenState extends State<ProductScreen> with TickerProviderStateM
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
-                            Text(
-                                product["category"],
-                                style: TextStyle(
-                                    fontFamily: 'Beheshti',
-                                    fontWeight: FontWeight.normal,
-                                    fontSize: 12,
-                                    color: Colors.lightBlue
-                                )
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.of(context).push(CupertinoPageRoute(builder: (context) => CategoryScreen(product["category_id"].toString().split("_")[0])));
+                              },
+                              child: Text(
+                                  product["category"],
+                                  style: TextStyle(
+                                      fontFamily: 'Beheshti',
+                                      fontWeight: FontWeight.normal,
+                                      fontSize: 12,
+                                      color: Colors.lightBlue
+                                  )
+                              ),
                             ),
                             SizedBox(width: 5),
                             Text(
-                                ">",
-                                style: TextStyle(
-                                    fontFamily: 'Beheshti',
-                                    fontWeight: FontWeight.normal,
-                                    fontSize: 12,
-                                    color: Colors.lightBlue.withOpacity(0.5)
-                                )
+                                  ">",
+                                  style: TextStyle(
+                                      fontFamily: 'Beheshti',
+                                      fontWeight: FontWeight.normal,
+                                      fontSize: 12,
+                                      color: Colors.lightBlue.withOpacity(0.5)
+                                  )
                             ),
                             SizedBox(width: 5),
-                            Text(
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.of(context).push(CupertinoPageRoute(builder: (context) => SubCategoryScreen(product["category_id"])));
+                              },
+                              child: Text(
                                 product["sub_category"],
                                 style: TextStyle(
                                     fontFamily: 'Beheshti',
@@ -412,6 +423,7 @@ class _ProductScreenState extends State<ProductScreen> with TickerProviderStateM
                                     color: Colors.lightBlue
                                 )
                             ),
+                            )
                           ],
                         ),
                       ),
