@@ -9,8 +9,13 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 
+Map<String, dynamic> product = {};
 class AddNewProductScreen extends StatefulWidget {
-  const AddNewProductScreen({Key? key}) : super(key: key);
+  AddNewProductScreen([Map<String, dynamic> p = const {}]) {
+    product = p;
+  }
+
+
   @override
   _AddNewProductScreenState createState() => _AddNewProductScreenState();
 }
@@ -73,9 +78,19 @@ class _AddNewProductScreenState extends State<AddNewProductScreen> {
   @override
   void initState() {
     super.initState();
-    colors = {};
-    sizes = [];
-    items = [];
+    if (product.isEmpty) {
+      colors = {};
+      sizes = [];
+      items = [];
+      attributes = {};
+    } else {
+      for (var i in product["colors"]) {
+        colors[i["name"]] = Color(int.parse(i["code"]));
+      }
+      for (var i in product["description"].keys) {
+        attributes[i] = product["description"][i];
+      }
+    }
     _getCategories();
   }
 
@@ -603,7 +618,7 @@ class _AddNewProductScreenState extends State<AddNewProductScreen> {
         Container(
           child: _image != null
               ? Image.file(_image!, fit: BoxFit.cover)
-              : Text('عکسی انتخاب نشده است',
+              : product.isNotEmpty ? new Image.asset(product["image"], fit: BoxFit.cover) : Text('عکسی انتخاب نشده است',
               style: TextStyle(
                   fontFamily: 'Beheshti',
                   fontWeight: FontWeight.normal,
@@ -679,7 +694,8 @@ class _AddNewProductScreenState extends State<AddNewProductScreen> {
         child: ListView(
           shrinkWrap: true,
           children: [
-          TextField (
+          TextFormField (
+            initialValue: product.isNotEmpty ? product["name"] : "",
             decoration: InputDecoration(
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -749,7 +765,8 @@ class _AddNewProductScreenState extends State<AddNewProductScreen> {
             ),
           ),
             SizedBox(height: 30),
-            TextField (
+            TextFormField (
+              initialValue: product.isNotEmpty ? product["seller"] : "",
               decoration: InputDecoration(
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -770,7 +787,8 @@ class _AddNewProductScreenState extends State<AddNewProductScreen> {
               ),
             ),
             SizedBox(height: 30),
-            TextField (
+            TextFormField (
+              initialValue: product.isNotEmpty ? product["price"].replaceAll(",", "") : "",
               decoration: InputDecoration(
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),

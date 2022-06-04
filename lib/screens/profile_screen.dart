@@ -5,6 +5,7 @@ import 'package:line_icons/line_icons.dart';
 import 'package:nama_kala/screens/addresses_screen.dart';
 import 'package:nama_kala/screens/edit_profile_screen.dart';
 import 'package:nama_kala/screens/favorites_screen.dart';
+import 'package:nama_kala/screens/login_screen.dart';
 import 'package:nama_kala/screens/my_products.dart';
 import 'package:nama_kala/screens/orders_screen.dart';
 
@@ -74,10 +75,15 @@ class ProfileScreen extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.only(left: 30, top: 40),
                 child:
-                  Align(
-                    alignment: Alignment.topLeft,
-                    child: Icon(LineIcons.doorOpen),
-                  )
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.of(context, rootNavigator: true).pushReplacement(MaterialPageRoute(builder: (context) => new LoginScreen()));
+                      },
+                      child: Align(
+                        alignment: Alignment.topLeft,
+                        child: Icon(LineIcons.doorOpen),
+                      ),
+                    )
               ),
             ],
           ),

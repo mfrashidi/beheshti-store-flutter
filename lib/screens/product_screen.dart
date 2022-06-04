@@ -10,8 +10,11 @@ import 'package:line_icons/line_icons.dart';
 import 'package:nama_kala/screens/category_screen.dart';
 import 'package:nama_kala/screens/sub_category_products.dart';
 
+import 'add_new_product_screen.dart';
+
 String productId = "";
 Map<String, dynamic> product = {};
+Map<String, dynamic> user = {};
 List images = [];
 IconData heart = LineIcons.heart;
 int colorIndex = 0;
@@ -44,6 +47,14 @@ class _ProductScreenState extends State<ProductScreen> with TickerProviderStateM
     });
   }
 
+  Future<void> _getUser() async {
+    final String response = await rootBundle.loadString('assets/user.json');
+    final data = await json.decode(response);
+    setState(() {
+      user = data;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -51,6 +62,7 @@ class _ProductScreenState extends State<ProductScreen> with TickerProviderStateM
     sizeIndex = 0;
     heart = LineIcons.heart;
     _getProducts();
+    _getUser();
   }
 
   Widget _productImage() {
@@ -315,6 +327,45 @@ class _ProductScreenState extends State<ProductScreen> with TickerProviderStateM
                 ],
               ),
             ),
+      ),
+    );
+  }
+
+  Widget _editButton() {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 35),
+      child: ElevatedButton(
+        onPressed: () {
+          Navigator.of(context).push(CupertinoPageRoute(builder: (context) => AddNewProductScreen(product)));
+        },
+        style: ElevatedButton.styleFrom(
+            primary: Color(0xff179268),
+            shadowColor: Colors.black.withOpacity(0.5),
+            fixedSize: Size(200, 50),
+            shape: new RoundedRectangleBorder(
+              borderRadius: new BorderRadius.circular(100),
+            )
+        ),
+        child:
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 10),
+          child: Stack(
+            children: [
+              Align(
+                alignment: Alignment.centerRight,
+                child: Text(
+                  "ویرایش محصول",
+                  style: TextStyle(fontFamily: 'Beheshti', fontWeight: FontWeight.bold, fontSize: 17),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Icon(Icons.edit),
+              )
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -642,7 +693,7 @@ class _ProductScreenState extends State<ProductScreen> with TickerProviderStateM
                 ),
                 Align(
                   alignment: Alignment.bottomCenter,
-                  child: _buyButton(),
+                  child: user["user_id"] == product["owner"] ? _editButton() : _buyButton(),
                 )
               ],
             ),
