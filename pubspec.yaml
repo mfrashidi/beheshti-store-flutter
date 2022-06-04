@@ -44,6 +44,7 @@ dependencies:
   dropdown_button2: any
   flutter_colorpicker: ^1.0.3
   image_picker: ^0.8.5+3
+  expandable: any
   flutter:
     sdk: flutter
 
