@@ -38,6 +38,9 @@ dependencies:
   anim_search_bar: ^2.0.2
   carousel_slider: ^4.1.1
   fluttertoast: ^8.0.8
+  custom_navigator:
+    git:
+      url: https://github.com/kjawadDeveloper/Custom-navigator.git
   flutter:
     sdk: flutter
 
