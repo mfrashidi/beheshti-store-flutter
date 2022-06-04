@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:nama_kala/screens/product_screen.dart';
+import 'package:nama_kala/screens/sub_category_products.dart';
 
 import '../assets/item_card.dart';
 
@@ -85,14 +86,19 @@ class _CategoryScreenState extends State<CategoryScreen>{
               ),
               Align(
                 alignment: Alignment.centerLeft,
-                child: Text(
-                    "تمام کالاها",
-                    style: TextStyle(
-                        fontFamily: 'Beheshti',
-                        fontWeight: FontWeight.normal,
-                        fontSize: 15,
-                        color: Colors.lightBlue
-                    )
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(CupertinoPageRoute(builder: (context) => SubCategoryScreen(categoryId+"_"+subCategory)));
+                  },
+                  child: Text(
+                      "تمام کالاها",
+                      style: TextStyle(
+                          fontFamily: 'Beheshti',
+                          fontWeight: FontWeight.normal,
+                          fontSize: 15,
+                          color: Colors.lightBlue
+                      )
+                  ),
                 ),
               )
             ],
