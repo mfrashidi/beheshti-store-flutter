@@ -1,0 +1,94 @@
+{
+  "DIGITAL": {
+    "name": "کالای دیجیتال",
+    "color": "0x9CA2F0FF",
+    "image": "assets/screens/categories/Macbook.png",
+    "has_fade_image": false,
+    "image_padding": 30.0,
+    "image_width": 125.0,
+    "sub_categories": {
+      "PHONE": {
+        "name": "موبایل",
+        "icon": "mobilePhone"
+      },
+      "LAPTOP": {
+        "name": "لپ تاپ",
+        "icon": "laptop"
+      },
+      "CAMERA": {
+        "name": "دوربین",
+        "icon": "camera"
+      }
+    }
+  },
+  "CLOTHING": {
+    "name": "پوشاک",
+    "color": "0xFFFFA0A0",
+    "image": "assets/screens/categories/clothing.png",
+    "has_fade_image": true,
+    "image_padding": 10.0,
+    "image_width": 100.0,
+    "sub_categories": {
+      "WOMEN": {
+        "name": "زنانه",
+        "icon": "female"
+      },
+      "MEN": {
+        "name": "مردانه",
+        "icon": "male"
+      },
+      "CHILD": {
+        "name": "بچگانه",
+        "icon": "child"
+      }
+    }
+  },
+  "BOOKS": {
+    "name": "کتاب و لوازم التحریر",
+    "color": "0xA2F0FF9C",
+    "image": "assets/screens/categories/Books.png",
+    "has_fade_image": false,
+    "image_padding": 20.0,
+    "image_width": 100.0,
+    "sub_categories": {
+      "BOOK": {
+        "name": "کتاب",
+        "icon": "book"
+      },
+      "STATIONERY": {
+        "name": "لوازم التحریر",
+        "icon": "pen"
+      },
+      "MUSIC": {
+        "name": "موسیقی",
+        "icon": "guitar"
+      },
+      "HANDICRAFTS": {
+        "name": "صنایع دستی",
+        "icon": "wrench"
+      }
+    }
+  },
+  "SPORT": {
+    "name": "ورزش و سفر",
+    "color": "0xA2A7FFC4",
+    "image": "assets/screens/categories/Tent.png",
+    "has_fade_image": false,
+    "image_padding": 5.0,
+    "image_width": 100.0,
+    "sub_categories": {
+      "CLOTHING": {
+        "name": "پوشاک ورزشی",
+        "icon": "running"
+      },
+      "GOODS": {
+        "name": "لوازم ورزشی",
+        "icon": "volleyballBall"
+      },
+      "CAMPING": {
+        "name": "لوازم سفر و کمپینگ",
+        "icon": "campground"
+      }
+    }
+  }
+}

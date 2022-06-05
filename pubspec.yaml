@@ -27,6 +27,25 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  google_nav_bar: ^5.0.6
+  line_icons: ^2.0.0
+  google_fonts: any
+  flutter_staggered_animations: ^1.0.0
+  navigation_dot_bar: ^0.1.3
+  simple_animations: ^4.0.2
+  badges: ^2.0.2
+  glassmorphism: any
+  anim_search_bar: ^2.0.2
+  carousel_slider: ^4.1.1
+  fluttertoast: ^8.0.8
+  custom_navigator:
+    git:
+      url: https://github.com/kjawadDeveloper/Custom-navigator.git
+  dropdown_button2: any
+  flutter_colorpicker: ^1.0.3
+  image_picker: ^0.8.5+3
+  passwordfield: ^0.1.0
+  expandable: any
   flutter:
     sdk: flutter
 
@@ -51,6 +70,23 @@ dev_dependencies:
 
 # The following section is specific to Flutter.
 flutter:
+  fonts:
+    - family: Beheshti
+      fonts:
+        - asset: assets/fonts/Beheshti-light.woff
+        - asset: assets/fonts/Beheshti-Regular.woff
+        - asset: assets/fonts/Beheshti-Bold.woff
+        - asset: assets/fonts/Beheshti-Black.woff
+  assets:
+    - assets/
+    - assets/products/
+    - assets/screens/categories/
+    - assets/screens/profile/
+    - assets/screens/cart/
+    - assets/screens/home/
+    - assets/screens/home/special_offer/
+    - assets/screens/home/best_seller/
+    - assets/screens/home/new_arrivals/
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
