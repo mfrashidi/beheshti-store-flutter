@@ -1,11 +1,16 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:passwordfield/passwordfield.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../main.dart';
 
+String serverResponse = "";
+final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 bool tryToLogin = true;
 
 TextEditingController nameController = TextEditingController();
@@ -23,6 +28,13 @@ TextEditingController passwordSController = TextEditingController();
 final numberRegex = RegExp(r'^(\+98|0)9[0-9]{9}$');
 final passwordRegex = RegExp(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$");
 
+void setToken(String token) async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final SharedPreferences prefs = await _prefs;
+  prefs.setString('token', token);
+  print("Token set to " + (prefs.getString("token") ?? "nothing"));
+}
+
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
   @override
@@ -30,6 +42,39 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginState extends State<LoginScreen> {
+
+  void authenticate(String phoneNumber, String password) async{
+    await Socket.connect("192.168.1.3", 4536).then((serverSocket) {
+      serverSocket.write("AUTHENTICATE=" + phoneSController.text + "," + passwordSController.text + "\n");
+      serverSocket.flush();
+      serverSocket.listen((response) {
+        String result = String.fromCharCodes(response);
+        if (result.length == 64) {
+          Fluttertoast.showToast(
+            msg: "خوش آمدید",
+            toastLength: Toast.LENGTH_LONG,
+            timeInSecForIosWeb: 1,
+            gravity: ToastGravity.CENTER,
+            backgroundColor: Colors.green,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
+          setToken(result);
+          Navigator.of(context).pushReplacement(CupertinoPageRoute(builder: (context) => HomePage()));
+        } else {
+          Fluttertoast.showToast(
+            msg: "ورود نامعتبر است",
+            toastLength: Toast.LENGTH_LONG,
+            timeInSecForIosWeb: 1,
+            gravity: ToastGravity.CENTER,
+            backgroundColor: Colors.redAccent,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
+        }
+      });
+    });
+  }
 
   @override
   void initState() {
@@ -91,7 +136,7 @@ class _LoginState extends State<LoginScreen> {
                   msg = "رمز عبور قابل قبول نیست";
                 } else {
                   isLoggedIn = true;
-                  Navigator.of(context).push(CupertinoPageRoute(builder: (context) => HomePage()));
+                  // Navigator.of(context).push(CupertinoPageRoute(builder: (context) => HomePage()));
                   Fluttertoast.showToast(
                     msg: "خوش آمدید",
                     toastLength: Toast.LENGTH_LONG,
@@ -182,24 +227,10 @@ class _LoginState extends State<LoginScreen> {
                 bool isLoggedIn = false;
                 if (phoneSController.text.isEmpty) {
                   msg = "فیلد شماره تماس اجباری است";
-                } else if (!numberRegex.hasMatch(phoneSController.text)) {
-                  msg = "شماره تماس اشتباه وارد شده است";
                 } else if (passwordSController.text.isEmpty) {
                   msg = "فیلد رمز عبور اجباری است";
-                } else if (!passwordRegex.hasMatch(passwordSController.text)) {
-                  msg = "رمز عبور قابل قبول نیست";
                 } else {
-                  isLoggedIn = true;
-                  Navigator.of(context).push(CupertinoPageRoute(builder: (context) => HomePage()));
-                  Fluttertoast.showToast(
-                    msg: "خوش آمدید",
-                    toastLength: Toast.LENGTH_LONG,
-                    timeInSecForIosWeb: 1,
-                    gravity: ToastGravity.CENTER,
-                    backgroundColor: Colors.green,
-                    textColor: Colors.white,
-                    fontSize: 16.0,
-                  );
+                  authenticate(phoneSController.text, passwordSController.text);
                 }
                 if (!isLoggedIn) {
                   Fluttertoast.showToast(
