@@ -1,12 +1,26 @@
+import 'dart:io';
+
 import 'package:custom_navigator/custom_scaffold.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:nama_kala/screens/cart_screen.dart';
 import 'package:nama_kala/screens/categories_screen.dart';
+import 'package:nama_kala/screens/login_screen.dart';
 import 'package:nama_kala/screens/profile_screen.dart';
 import 'screens/home_screen.dart';
-import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:line_icons/line_icons.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+
+Future<String?> getToken() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final SharedPreferences prefs = await _prefs;
+  final String token = prefs.getString('token') ?? "empty";
+  print("Token is " + token);
+
+  return token;
+}
 
 
 void main() => runApp(MaterialApp(
@@ -19,7 +33,7 @@ void main() => runApp(MaterialApp(
       primaryColor: Colors.grey[800],
       scaffoldBackgroundColor: Colors.white
     ),
-    home: HomePage()));
+    home: getToken() == "empty" ? LoginScreen() : HomePage()));
 
 class HomePage extends StatefulWidget {
   @override
