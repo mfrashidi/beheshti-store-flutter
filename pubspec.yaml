@@ -46,6 +46,7 @@ dependencies:
   image_picker: ^0.8.5+3
   passwordfield: ^0.1.0
   expandable: any
+  shared_preferences: any
   flutter:
     sdk: flutter
 
