@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:custom_navigator/custom_scaffold.dart';
@@ -11,29 +12,24 @@ import 'screens/home_screen.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
-Future<String?> getToken() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  final SharedPreferences prefs = await _prefs;
-  final String token = prefs.getString('token') ?? "empty";
-  print("Token is " + token);
-
-  return token;
+  SharedPreferences.getInstance().then((instance) {
+    bool _isLoggedIn = (instance.getString('token') ?? "empty") != "empty";
+    runApp(MaterialApp(
+        debugShowCheckedModeBanner: false,
+        builder: (context, child) {
+          return Directionality(textDirection: TextDirection.rtl, child: child!);
+        },
+        title: 'Beheshti Store',
+        theme: ThemeData(
+            primaryColor: Colors.grey[800],
+            scaffoldBackgroundColor: Colors.white
+        ),
+        home: _isLoggedIn ? HomePage() : LoginScreen()));
+  });
 }
-
-
-void main() => runApp(MaterialApp(
-    debugShowCheckedModeBanner: false,
-    builder: (context, child) {
-      return Directionality(textDirection: TextDirection.rtl, child: child!);
-    },
-    title: 'Beheshti Store',
-    theme: ThemeData(
-      primaryColor: Colors.grey[800],
-      scaffoldBackgroundColor: Colors.white
-    ),
-    home: getToken() == "empty" ? LoginScreen() : HomePage()));
 
 class HomePage extends StatefulWidget {
   @override
