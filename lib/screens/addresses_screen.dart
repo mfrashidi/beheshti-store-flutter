@@ -1,9 +1,13 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:line_icons/line_icons.dart';
+
+import '../utils/converter.dart';
+import 'category_screen.dart';
 
 Map<String, dynamic> user = {};
 int activeAddress = 0;
@@ -18,10 +22,56 @@ class AddressesScreen extends StatefulWidget {
 class _AddressesScreenState extends State<AddressesScreen> {
 
   Future<void> _getUser() async {
-    final String response = await rootBundle.loadString('assets/user.json');
-    final data = await json.decode(response);
-    setState(() {
-      user = data;
+    await Socket.connect("192.168.1.7", 4536).then((serverSocket) async {
+      String token = await getToken() ?? "nothing";
+      serverSocket.write("AUTH=" + token + ";GET_ME\n");
+      serverSocket.flush();
+      serverSocket.listen((response) async {
+        final data = await json.decode(utf8.decode(response));
+        setState(() {
+          user = data;
+          activeAddress = user["active_address"];
+        });
+      });
+    });
+  }
+
+  Future<void> _setActiveAddress(int index) async {
+    await Socket.connect("192.168.1.7", 4536).then((serverSocket) async {
+      String token = await getToken() ?? "nothing";
+      serverSocket.write("AUTH=" + token + ";SET_ACTIVE_ADDRESS=" + index.toString() + "\n");
+      serverSocket.flush();
+      serverSocket.listen((response) async {
+        if (utf8.decode(response) == "DONE") {
+          print("Active address changed");
+        }
+      });
+    });
+  }
+
+  Future<void> _addAddress(String name, String location) async {
+    await Socket.connect("192.168.1.7", 4536).then((serverSocket) async {
+      String token = await getToken() ?? "nothing";
+      serverSocket.write("AUTH=" + token + ";ADD_ADDRESS=" + unNormalize(name + "@ " + location) + "\n");
+      serverSocket.flush();
+      serverSocket.listen((response) async {
+        if (utf8.decode(response) == "DONE") {
+          print("Address added");
+        }
+      });
+    });
+  }
+
+  Future<void> _removeAddress(int index) async {
+    await Socket.connect("192.168.1.7", 4536).then((serverSocket) async {
+      String token = await getToken() ?? "nothing";
+      serverSocket.write("AUTH=" + token + ";REMOVE_ADDRESS=" + index.toString() + "\n");
+      serverSocket.flush();
+      serverSocket.listen((response) async {
+        if (utf8.decode(response) == "DONE") {
+          print("Address removed");
+        }
+      });
     });
   }
 
@@ -111,11 +161,11 @@ class _AddressesScreenState extends State<AddressesScreen> {
                 ),
                 onPressed: () {
                   setState(() {
-                    print(addresses);
                     addresses.add({
                       "title": attController.text,
                       "address": desController.text
                     });
+                    _addAddress(attController.text, desController.text);
                   });
                   Navigator.of(context).pop();
                 },
@@ -127,7 +177,7 @@ class _AddressesScreenState extends State<AddressesScreen> {
 
   Widget _getAddressList() {
     addresses = user["addresses"];
-    return ListView.separated(
+    return user.isNotEmpty ? ListView.separated(
         separatorBuilder: (context, index) => SizedBox(
           height: 10,
         ),
@@ -138,6 +188,7 @@ class _AddressesScreenState extends State<AddressesScreen> {
             onTap: (){
               setState(() {
                 activeAddress = index;
+                _setActiveAddress(activeAddress);
               });
             },
             child: Container(
@@ -199,7 +250,9 @@ class _AddressesScreenState extends State<AddressesScreen> {
                         onTap: () {
                           setState(() {
                             addresses.removeAt(index);
+                            _removeAddress(index);
                             activeAddress = 0;
+                            _setActiveAddress(activeAddress);
                           });
                         },
                         child: Icon(LineIcons.trash, color: index == activeAddress ? Colors.green : Colors.grey.withOpacity(0.5),),
@@ -210,7 +263,7 @@ class _AddressesScreenState extends State<AddressesScreen> {
             ),
           );
         }
-    );
+    ) : CircularProgressIndicator(color: Colors.grey.shade300);
   }
 
   @override
