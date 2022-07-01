@@ -1,9 +1,11 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:shimmer/shimmer.dart';
 
 import 'category_screen.dart';
 
@@ -37,14 +39,19 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
   }
 
   Future<void> _getCategories() async {
-    final String response = await rootBundle.loadString(
-        'assets/categories.json');
-    final data = await json.decode(response);
-    setState(() {
-      Map<String, dynamic> categoriesMap = data;
-      categoriesMap.forEach((key, value) {
-        categoryNames.add(key);
-        categories.add(value);
+    await Socket.connect("192.168.1.7", 4536).then((serverSocket) async {
+      String token = await getToken() ?? "nothing";
+      serverSocket.write("AUTH=" + token + ";GET_CATEGORIES\n");
+      serverSocket.flush();
+      serverSocket.listen((response) async {
+        final data = await json.decode(utf8.decode(response));
+        setState(() {
+          Map<String, dynamic> categoriesMap = data;
+          categoriesMap.forEach((key, value) {
+            categoryNames.add(key);
+            categories.add(value);
+          });
+        });
       });
     });
   }
@@ -52,14 +59,18 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
   @override
   void initState() {
     super.initState();
-    if (categories.isEmpty) _getCategories();
+    categoryNames = [];
+    categories = [];
+    WidgetsBinding.instance?.addPostFrameCallback((_) async {
+      await _getCategories();
+    });
   }
 
   @override
   Widget build(BuildContext context){
     return Scaffold(
-        body: AnimationLimiter(
-          child: categories.isEmpty ? Container() : Container(
+        body: (categoryNames.isNotEmpty && categories.isNotEmpty) ? AnimationLimiter(
+          child: Container(
             child: GridView.builder(
               physics: BouncingScrollPhysics(),
               shrinkWrap: true,
@@ -69,7 +80,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                 crossAxisSpacing: 30,
                 mainAxisSpacing: 30,
               ),
-              itemCount: categories.length,
+              itemCount: categories.isNotEmpty ? categories.length : 4,
               itemBuilder: (context, index) {
                 return AnimationConfiguration.staggeredList(
                   position: index,
@@ -130,7 +141,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
             ),
             padding: EdgeInsets.symmetric(horizontal: 25),
           ),
-        ),
+        ) : Center(child: CircularProgressIndicator(color: Colors.grey.shade300)),
         appBar: AppBar(
             title: Text(
                 "دسته بندی کالاها",
