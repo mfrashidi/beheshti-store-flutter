@@ -1,4 +1,7 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -6,11 +9,16 @@ import 'package:flutter/services.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:nama_kala/assets/item_card.dart';
 import 'package:nama_kala/screens/product_screen.dart';
+import 'package:nama_kala/utils/converter.dart';
+import 'package:shimmer/shimmer.dart';
 import '../customized_libs/search_widget.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
 Map<String, dynamic> products = {};
+Map<String, dynamic> bestSeller = {};
+List<String> newArrivals = [];
+List<String> specialOffers = [];
 
 class Home extends StatelessWidget {
   const Home({Key? key}) : super(key: key);
@@ -41,6 +49,111 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  Future<Map<String, dynamic>> getProduct(String productId) async {
+    Completer<Map<String, dynamic>> _completer = Completer<Map<String, dynamic>>();
+    await Socket.connect("192.168.1.7", 4536).then((serverSocket) async {
+      String token = await getToken() ?? "nothing";
+      serverSocket.write("AUTH=" + token + ";GET_PRODUCT=" + productId + "\n");
+      serverSocket.flush();
+      serverSocket.listen((response) async {
+        _completer.complete(json.decode(utf8.decode(response)));
+      });
+    });
+
+    return _completer.future;
+  }
+
+  Future<int> _getImageLength(String imageID) async {
+    Completer<int> _completer = Completer<int>();
+    await Socket.connect("192.168.1.7", 4536).then((serverSocket) async {
+      String token = await getToken() ?? "nothing";
+      serverSocket.write("AUTH=" + token + ";GET_IMAGE_LENGTH=" + imageID + "\n");
+      serverSocket.flush();
+      serverSocket.listen((response) async {
+        _completer.complete(int.parse(String.fromCharCodes(response)));
+      });
+    });
+    return _completer.future;
+  }
+
+  Future<String> _getImage(String imageID) async {
+    Completer<String> _completer = Completer<String>();
+    String result = "";
+    int length = await _getImageLength(imageID);
+    await Socket.connect("192.168.1.7", 4536).then((serverSocket) async {
+      String token = await getToken() ?? "nothing";
+      serverSocket.write("AUTH=" + token + ";GET_IMAGE=" + imageID + "\n");
+      serverSocket.flush();
+      serverSocket.listen((response) async {
+        result += await String.fromCharCodes(response);
+        if (result.length >= length) {
+          _completer.complete(result);
+        }
+      });
+    });
+    return _completer.future;
+  }
+
+  Future<void> _getBestSeller() async {
+    await Socket.connect("192.168.1.7", 4536).then((serverSocket) async {
+      String token = await getToken() ?? "nothing";
+      serverSocket.write("AUTH=" + token + ";GET_BEST_SELLER\n");
+      serverSocket.flush();
+      serverSocket.listen((response) async {
+        bestSeller = json.decode(utf8.decode(response));
+        bestSeller["image"] = await _getImage(bestSeller["image"]);
+        setState(() {
+        });
+      });
+    });
+  }
+
+  Future<void> _getSpecialOffers() async {
+    await Socket.connect("192.168.1.7", 4536).then((serverSocket) async {
+      String token = await getToken() ?? "nothing";
+      serverSocket.write("AUTH=" + token + ";GET_SPECIAL_OFFERS\n");
+      serverSocket.flush();
+      serverSocket.listen((response) async {
+        setState(() {
+          List<dynamic> data = json.decode(utf8.decode(response));
+          for (var p in data) {
+            specialOffers.add(p.toString());
+          }
+        });
+      });
+    });
+  }
+
+  Future<void> _getNewArrivals() async {
+    await Socket.connect("192.168.1.7", 4536).then((serverSocket) async {
+      String token = await getToken() ?? "nothing";
+      serverSocket.write("AUTH=" + token + ";GET_NEW_ARRIVALS\n");
+      serverSocket.flush();
+      serverSocket.listen((response) async {
+        setState(() {
+          List<dynamic> data = json.decode(utf8.decode(response));
+          for (var p in data) {
+            newArrivals.add(p.toString());
+          }
+        });
+      });
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    bestSeller = {};
+    newArrivals = [];
+    specialOffers = [];
+
+    WidgetsBinding.instance?.addPostFrameCallback((_) async {
+      await _getNewArrivals();
+      await _getBestSeller();
+      await _getSpecialOffers();
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -53,21 +166,6 @@ class _HomeScreenState extends State<HomeScreen> {
       "assets/screens/home/banner_4.jpeg",
     ];
 
-    List<String> specialOffers = [
-      "26c0a9b017",
-      "53a829e24d",
-      "0e3982c7bb",
-      "e087af427e"
-    ];
-
-    List<String> newArrivals = [
-      "51d7aa3a08",
-      "0a265bf1a8",
-      "ac28f88fbc",
-      "8adfc0d358"
-    ];
-
-    String bestSeller = "a4f2e210f6";
     return Scaffold(
       appBar: AppBar(
         flexibleSpace: Padding(
@@ -168,7 +266,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 scrollDirection: Axis.horizontal,
                 physics: BouncingScrollPhysics(),
                 padding: EdgeInsets.symmetric(vertical: 20),
-                itemCount: specialOffers.length + 1,
+                itemCount: specialOffers.isNotEmpty ? specialOffers.length + 1 : 5,
                 itemBuilder: (context, index) {
                   return AnimationConfiguration.staggeredList(
                     position: index,
@@ -204,11 +302,46 @@ class _HomeScreenState extends State<HomeScreen> {
                                       ),
                                     ],
                                   ),
-                                  padding: EdgeInsets.all(10),
-                                  child: products.isNotEmpty ? getItemCard(
-                                      products[specialOffers[index - 1]]["image"],
-                                      products[specialOffers[index - 1]]["name"],
-                                      products[specialOffers[index - 1]]["price"]) : Container()
+                                  child: specialOffers.isNotEmpty ? FutureBuilder<Map<String, dynamic>>(
+                                      future: getProduct(specialOffers[index - 1]),
+                                      builder: (context, AsyncSnapshot<Map<String, dynamic>> product) {
+                                        if (product.hasData) {
+                                          return Container(
+                                            padding: EdgeInsets.all(10),
+                                            child: getItemCard(
+                                                product.data?["image"],
+                                                product.data?["name"],
+                                                product.data?["price"])
+                                          );
+                                        } else {
+                                          return SizedBox(
+                                            width: 165.0,
+                                            height: 250.0,
+                                            child: Shimmer.fromColors(
+                                                baseColor: Colors.white,
+                                                highlightColor: Colors.grey.shade100,
+                                                child: Container(
+                                                  width: 500.0,
+                                                  height: 500.0,
+                                                  color: Colors.white,
+                                                )
+                                            ),
+                                          );
+                                        }
+                                      }
+                                  ) : SizedBox(
+                                    width: 165.0,
+                                    height: 250.0,
+                                    child: Shimmer.fromColors(
+                                        baseColor: Colors.white,
+                                        highlightColor: Colors.grey.shade100,
+                                        child: Container(
+                                          width: 165.0,
+                                          height: 250.0,
+                                          color: Colors.white,
+                                        )
+                                    ),
+                                  )
                                   ,
                                 ),
                               )
@@ -251,10 +384,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ),
-                products.isNotEmpty ?
-                    GestureDetector(
+                GestureDetector(
                       onTap: () {
-                        _showProductScreen(context, bestSeller);
+                        if (bestSeller.isNotEmpty) {
+                          _showProductScreen(context, bestSeller["product_id"]);
+                        }
                       },
                       child: Container(
                         padding: EdgeInsets.all(15),
@@ -279,21 +413,43 @@ class _HomeScreenState extends State<HomeScreen> {
                             crossAxisSpacing: 30,
                           ),
                           children: [
-                            new Image.asset(
-                              products[bestSeller]["image"],
+                            bestSeller.isNotEmpty && (bestSeller["image"] as String).length > 1000 ? Image.memory(Uint8List.fromList(base64Decode(bestSeller["image"]))) : SizedBox(
+                              width: 75,
+                              height: 75,
+                              child: Shimmer.fromColors(
+                                  baseColor: Colors.grey.shade50,
+                                  highlightColor: Colors.grey.shade100,
+                                  child: Container(
+                                    width: 500.0,
+                                    height: 500.0,
+                                    color: Colors.white,
+                                  )
+                              ),
                             ),
                             Stack(
                               children: [
-                                Text(
-                                    products[bestSeller]["name"],
+                                bestSeller.isNotEmpty ? Text(
+                                    bestSeller["name"],
                                     style: TextStyle(
                                         fontFamily: 'Beheshti',
                                         fontWeight: FontWeight.bold,
                                         fontSize: 15,
                                         color: Colors.black
                                     )
+                                ) : SizedBox(
+                                  width: 125,
+                                  height: 30,
+                                  child: Shimmer.fromColors(
+                                      baseColor: Colors.grey.shade50,
+                                      highlightColor: Colors.grey.shade100,
+                                      child: Container(
+                                        width: 500.0,
+                                        height: 500.0,
+                                        color: Colors.white,
+                                      )
+                                  ),
                                 ),
-                                Align(
+                                bestSeller.isNotEmpty ? Align(
                                   alignment: Alignment.bottomLeft,
                                   child: Container(
                                     height: 23,
@@ -303,7 +459,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       scrollDirection: Axis.horizontal,
                                       children: [
                                         Text(
-                                            products[bestSeller]["price"],
+                                            persianNumber(bestSeller["price"]),
                                             style: TextStyle(
                                                 fontFamily: 'Beheshti',
                                                 fontWeight: FontWeight.normal,
@@ -323,19 +479,19 @@ class _HomeScreenState extends State<HomeScreen> {
                                       ],
                                     ),
                                   ),
-                                ),
-                                Align(
+                                ) : Container(),
+                                bestSeller.isNotEmpty ? Align(
                                     alignment: Alignment.bottomRight,
                                     child: Icon(CupertinoIcons.cart_badge_plus,
                                       size: 22,
                                       color: Color(0xFF207D4C),)
-                                )
+                                ) : Container()
                               ],
                             )
                           ],
                         ),
                       ),
-                    ) : Container()
+                    )
               ],
             ),
           ),
@@ -377,7 +533,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       scrollDirection: Axis.horizontal,
                       physics: BouncingScrollPhysics(),
                       padding: EdgeInsets.symmetric(vertical: 20),
-                      itemCount: newArrivals.length,
+                      itemCount: newArrivals.isNotEmpty ? newArrivals.length : 4,
                       itemBuilder: (context, index) {
                         return AnimationConfiguration.staggeredList(
                           position: index,
@@ -389,7 +545,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                 child: FadeInAnimation(
                                     child: GestureDetector(
                                     onTap: () {
-                                    _showProductScreen(context, newArrivals[index]);
+                                    if (newArrivals.isNotEmpty) {
+                                      _showProductScreen(context, newArrivals[index]);
+                                    }
                                     },
                                       child: Container(
                                         width: 165,
@@ -405,16 +563,50 @@ class _HomeScreenState extends State<HomeScreen> {
                                             ),
                                           ],
                                         ),
-                                        padding: EdgeInsets.all(10),
-                                        child: products.isNotEmpty ? getItemCard(
-                                            products[newArrivals[index]]["image"],
-                                            products[newArrivals[index]]["name"],
-                                            products[newArrivals[index]]["price"]) : Container(),
-                                      ),
+                                        child: newArrivals.isNotEmpty ? FutureBuilder<Map<String, dynamic>>(
+                                        future: getProduct(newArrivals[index]),
+                                        builder: (context, AsyncSnapshot<Map<String, dynamic>> product) {
+                                          if (product.hasData) {
+                                            return Container(
+                                              padding: EdgeInsets.all(10),
+                                              child: getItemCard(
+                                                  product.data?["image"],
+                                                  product.data?["name"],
+                                                  product.data?["price"])
+                                            );
+                                          } else {
+                                            return SizedBox(
+                                              width: 165.0,
+                                              height: 250.0,
+                                              child: Shimmer.fromColors(
+                                                  baseColor: Colors.white,
+                                                  highlightColor: Colors.grey.shade100,
+                                                  child: Container(
+                                                    width: 500.0,
+                                                    height: 500.0,
+                                                    color: Colors.white,
+                                                  )
+                                              ),
+                                            );
+                                          }
+                                        }
+                                    ) : SizedBox(
+                                          width: 165.0,
+                                          height: 250.0,
+                                          child: Shimmer.fromColors(
+                                              baseColor: Colors.white,
+                                              highlightColor: Colors.grey.shade100,
+                                              child: Container(
+                                                width: 500.0,
+                                                height: 500.0,
+                                                color: Colors.white,
+                                              )
+                                          ),
+                                        ),
                                     )
                                 ),
                               )),
-                        );
+                        ));
                       }
                   ),
                 )

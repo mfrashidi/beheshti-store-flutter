@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:nama_kala/screens/product_screen.dart';
+import 'package:shimmer/shimmer.dart';
 
 import '../assets/item_card.dart';
 
@@ -13,6 +16,7 @@ String subCategoryId = "";
 Map<String, dynamic> category = {};
 Map<String, dynamic> subCategory = {};
 Map<String, dynamic> products = {};
+List<String> productIds = [];
 
 class SubCategoryScreen extends StatefulWidget {
   SubCategoryScreen(String id) {
@@ -25,40 +29,56 @@ class SubCategoryScreen extends StatefulWidget {
 
 class _SubCategoryScreenState extends State<SubCategoryScreen> {
 
-  Future<void> _getCategories() async {
-    final String response = await rootBundle.loadString(
-        'assets/categories.json');
-    final data = await json.decode(response);
-    setState(() {
-      Map<String, dynamic> categoriesMap = data;
-      category = categoriesMap[subCategoryId.split("_")[0]];
-      subCategory = category["sub_categories"][subCategoryId.split("_")[1]];
-    }
-    );
+  Future<Map<String, dynamic>> getProduct(String productId) async {
+    Completer<Map<String, dynamic>> _completer = Completer<Map<String, dynamic>>();
+    await Socket.connect("192.168.1.7", 4536).then((serverSocket) async {
+      String token = await getToken() ?? "nothing";
+      serverSocket.write("AUTH=" + token + ";GET_PRODUCT=" + productId + "\n");
+      serverSocket.flush();
+      serverSocket.listen((response) async {
+        _completer.complete(json.decode(utf8.decode(response)));
+      });
+    });
+
+    return _completer.future;
   }
 
-  Future<void> _getProducts() async {
-    final String response = await rootBundle.loadString('assets/products.json');
-    final data = await json.decode(response);
-    setState(() {
-      products = data;
+  Future<void> _getCategory() async {
+    String result;
+
+    await Socket.connect("192.168.1.7", 4536).then((serverSocket) async {
+      String token = await getToken() ?? "nothing";
+      serverSocket.write("AUTH=" + token + ";GET_CATEGORY=" + subCategoryId.split("_")[0] + "\n");
+      serverSocket.flush();
+      serverSocket.listen((response) async {
+        result = utf8.decode(response);
+        final data = await json.decode(result);
+        setState(() {
+          category = data;
+          subCategory = category["sub_categories"][subCategoryId.split("_")[1]];
+          List<dynamic> pIDs = json.decode(subCategory["products"]);
+          productIds = [];
+          for (var p in pIDs) {
+            productIds.add(p.toString());
+          }
+        });
+      });
     });
   }
 
   @override
   void initState() {
     super.initState();
-    _getCategories();
-    _getProducts();
+    _getCategory();
   }
 
   @override
   Widget build(BuildContext context) {
-    Map<String, dynamic> filteredProducts = Map.from(products)..removeWhere((k, v) => !v["category_id"].toString().endsWith(subCategoryId));
-    List<String> productIds = [];
-    for (var k in filteredProducts.keys) {
-      productIds.add(k);
-    }
+    // Map<String, dynamic> filteredProducts = Map.from(products)..removeWhere((k, v) => !v["category_id"].toString().endsWith(subCategoryId));
+    // List<String> productIds = [];
+    // for (var k in filteredProducts.keys) {
+    //   productIds.add(k);
+    // }
     return Scaffold(
         appBar: AppBar(
             flexibleSpace: SafeArea(
@@ -66,11 +86,24 @@ class _SubCategoryScreenState extends State<SubCategoryScreen> {
                 alignment: Alignment.centerLeft,
                 child: Padding(
                   padding: EdgeInsets.only(left: 20),
-                  child: Icon(LineIcons.byName(subCategory["icon"]), size: 30),
+                  child: subCategory.isNotEmpty ? Icon(LineIcons.byName(subCategory["icon"]), size: 30) :
+                  SizedBox(
+                    width: 30.0,
+                    height: 30.0,
+                    child: Shimmer.fromColors(
+                        baseColor: Colors.white,
+                        highlightColor: Colors.grey.shade100,
+                        child: Container(
+                          width: 10.0,
+                          height: 10.0,
+                          color: Colors.white,
+                        )
+                    ),
+                  ),
                 ),
               ),
             ),
-            title: Column(
+            title: (category.isNotEmpty && subCategory.isNotEmpty) ? Column(
                 children: <Widget>[
                   Text(
                       category["name"],
@@ -92,6 +125,18 @@ class _SubCategoryScreenState extends State<SubCategoryScreen> {
                       )
                   ),
                 ]
+            ) : SizedBox(
+              width: 10.0,
+              height: 10.0,
+              child: Shimmer.fromColors(
+                  baseColor: Colors.white,
+                  highlightColor: Colors.grey.shade100,
+                  child: Container(
+                    width: 75.0,
+                    height: 30.0,
+                    color: Colors.white,
+                  )
+              ),
             ),
             leading: GestureDetector(
               onTap: () {
@@ -145,10 +190,34 @@ class _SubCategoryScreenState extends State<SubCategoryScreen> {
                                 ],
                               ),
                               padding: EdgeInsets.all(10),
-                              child: products.isNotEmpty ? getItemCard(
-                                  products[productIds[index]]["image"],
-                                  products[productIds[index]]["name"],
-                                  products[productIds[index]]["price"]) : Container(),
+                              child: FutureBuilder<Map<String, dynamic>>(
+                                  future: getProduct(productIds[index]),
+                                  builder: (context, AsyncSnapshot<Map<String, dynamic>> product) {
+                                    if (product.hasData) {
+                                      return Container(
+                                        padding: EdgeInsets.all(10),
+                                        child: getItemCard(
+                                            product.data?["image"],
+                                            product.data?["name"],
+                                            product.data?["price"]),
+                                      );
+                                    } else {
+                                      return SizedBox(
+                                        width: 165.0,
+                                        height: 250.0,
+                                        child: Shimmer.fromColors(
+                                            baseColor: Colors.white,
+                                            highlightColor: Colors.grey.shade100,
+                                            child: Container(
+                                              width: 500.0,
+                                              height: 500.0,
+                                              color: Colors.white,
+                                            )
+                                        ),
+                                      );
+                                    }
+                                  }
+                              ),
                             ),
                           )
                       ),

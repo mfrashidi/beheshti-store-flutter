@@ -1,26 +1,54 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:nama_kala/screens/category_screen.dart';
 import 'package:nama_kala/screens/sub_category_products.dart';
+import 'package:nama_kala/utils/converter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shimmer/shimmer.dart';
 
 import 'add_new_product_screen.dart';
 
 String productId = "";
 Map<String, dynamic> product = {};
+Map<String, dynamic> category = {};
 Map<String, dynamic> user = {};
 List images = [];
 IconData heart = LineIcons.heart;
 int colorIndex = 0;
 int sizeIndex = 0;
 
+final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
+Future<String?> getToken() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final SharedPreferences prefs = await _prefs;
+  final String token = prefs.getString('token') ?? "empty";
+
+  return token;
+}
+
+Future<String> getSellerName(String sellerID) async {
+  Completer<String> _completer = Completer<String>();
+  await Socket.connect("192.168.1.7", 4536).then((serverSocket) async {
+    String token = await getToken() ?? "nothing";
+    serverSocket.write("AUTH=" + token + ";GET_USER_NAME=" + sellerID + "\n");
+    serverSocket.flush();
+    serverSocket.listen((response) async {
+      _completer.complete(utf8.decode(response));
+    });
+  });
+
+  return _completer.future;
+}
 
 class ProductScreen extends StatefulWidget {
   ProductScreen(String id) {
@@ -35,23 +63,131 @@ class _ProductScreenState extends State<ProductScreen> with TickerProviderStateM
   late AnimationController controller;
   late Animation<double> animation;
 
-  Future<void> _getProducts() async {
-    final String response = await rootBundle.loadString('assets/products.json');
-    final data = await json.decode(response);
-    images = [];
-    setState(() {
-      product = data[productId];
-      for (int i = 1; i < product["images_count"] + 1; i++) {
-        images.add("assets/products/$productId-$i.jpeg");
-      }
+  Future<void> _getProduct() async {
+    String result;
+    await Socket.connect("192.168.1.7", 4536).then((serverSocket) async {
+      String token = await getToken() ?? "nothing";
+      serverSocket.write("AUTH=" + token + ";GET_PRODUCT=" + productId + "\n");
+      serverSocket.flush();
+      serverSocket.listen((response) async {
+        result = utf8.decode(response);
+        final data = await json.decode(result);
+        images = [];
+        setState(() {
+          product = data;
+          for (int i = 1; i < product["images_count"] + 1; i++) {
+            images.add("assets/products/$productId-$i.jpeg");
+          }
+        });
+        product["image"] = await _getImage(product["image"]);
+        _getCategory();
+      });
     });
   }
 
+  Future<int> _getImageLength(String imageID) async {
+    Completer<int> _completer = Completer<int>();
+    await Socket.connect("192.168.1.7", 4536).then((serverSocket) async {
+      String token = await getToken() ?? "nothing";
+      serverSocket.write("AUTH=" + token + ";GET_IMAGE_LENGTH=" + imageID + "\n");
+      serverSocket.flush();
+      serverSocket.listen((response) async {
+        _completer.complete(int.parse(String.fromCharCodes(response)));
+      });
+    });
+    return _completer.future;
+  }
+
+  Future<String> _getImage(String imageID) async {
+    Completer<String> _completer = Completer<String>();
+    String result = "";
+    int length = await _getImageLength(imageID);
+    await Socket.connect("192.168.1.7", 4536).then((serverSocket) async {
+      String token = await getToken() ?? "nothing";
+      serverSocket.write("AUTH=" + token + ";GET_IMAGE=" + imageID + "\n");
+      serverSocket.flush();
+      serverSocket.listen((response) async {
+        result += await String.fromCharCodes(response);
+        if (result.length >= length) {
+          _completer.complete(result);
+        }
+      });
+    });
+    return _completer.future;
+  }
+
   Future<void> _getUser() async {
-    final String response = await rootBundle.loadString('assets/user.json');
-    final data = await json.decode(response);
-    setState(() {
-      user = data;
+    await Socket.connect("192.168.1.7", 4536).then((serverSocket) async {
+      String token = await getToken() ?? "nothing";
+      serverSocket.write("AUTH=" + token + ";GET_ME\n");
+      serverSocket.flush();
+      serverSocket.listen((response) async {
+        final data = await json.decode(utf8.decode(response));
+        setState(() {
+          user = data;
+        });
+      });
+    });
+  }
+
+  Future<void> _getFavorites() async {
+    List<String> favorites = [];
+    await Socket.connect("192.168.1.7", 4536).then((serverSocket) async {
+      String token = await getToken() ?? "nothing";
+      serverSocket.write("AUTH=" + token + ";GET_FAVORITES" + "\n");
+      serverSocket.flush();
+      serverSocket.listen((response) async {
+        List<dynamic> data = json.decode(utf8.decode(response));
+        for (var f in data) {
+          favorites.add(f.toString());
+        }
+        setState(() {
+          if (favorites.contains(productId)) {
+            heart = LineIcons.heartAlt;
+          } else {
+            heart = LineIcons.heart;
+          }
+        });
+      });
+    });
+  }
+
+  Future<void> _addToCart() async {
+    await Socket.connect("192.168.1.7", 4536).then((serverSocket) async {
+      String token = await getToken() ?? "nothing";
+      serverSocket.write("AUTH=" + token + ";ADD_TO_CART=" + product["product_id"] + "@1@" +
+          (product["has_color"] ? colorIndex.toString() : "-1") + "@" + (product["has_size"] ? sizeIndex.toString() : "-1") + "\n");
+      serverSocket.flush();
+      serverSocket.listen((response) async {
+        if (utf8.decode(response) == "DONE") {
+          Fluttertoast.showToast(
+            msg: "محصول به سبدخرید شما اضافه شد",
+            toastLength: Toast.LENGTH_LONG,
+            timeInSecForIosWeb: 1,
+            gravity: ToastGravity.CENTER,
+            backgroundColor: Colors.green,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
+        }
+      });
+    });
+  }
+
+  Future<void> _getCategory() async {
+    String result;
+
+    await Socket.connect("192.168.1.7", 4536).then((serverSocket) async {
+      String token = await getToken() ?? "nothing";
+      serverSocket.write("AUTH=" + token + ";GET_CATEGORY=" + product["sub_category"].split("_")[0] + "\n");
+      serverSocket.flush();
+      serverSocket.listen((response) async {
+        result = utf8.decode(response);
+        final data = await json.decode(result);
+        setState(() {
+          category = data;
+        });
+      });
     });
   }
 
@@ -60,9 +196,13 @@ class _ProductScreenState extends State<ProductScreen> with TickerProviderStateM
     super.initState();
     colorIndex = 0;
     sizeIndex = 0;
-    heart = LineIcons.heart;
-    _getProducts();
-    _getUser();
+    product = {};
+    category = {};
+    WidgetsBinding.instance?.addPostFrameCallback((_) async {
+      await _getProduct();
+      await _getUser();
+      await _getFavorites();
+    });
   }
 
   Widget _productImage() {
@@ -71,17 +211,14 @@ class _ProductScreenState extends State<ProductScreen> with TickerProviderStateM
       options: CarouselOptions(
         height: MediaQuery.of(context).size.width,
         autoPlayInterval: Duration(seconds: 5),
-        autoPlay: true,
         viewportFraction: 1,
       ),
       carouselController: _controller,
-      items: images.map((i) {
-        return Builder(
-          builder: (BuildContext context) {
-            return Image.asset(i);
-          },
-        );
-      }).toList(),
+      items: [product.isNotEmpty && (product["image"] as String).length > 1000 ? Image.memory(Uint8List.fromList(base64Decode(product["image"]))) : Container(
+        child: Center(
+          child: CircularProgressIndicator(color: Colors.grey.shade300),
+        ),
+      )],
     );
   }
 
@@ -251,7 +388,7 @@ class _ProductScreenState extends State<ProductScreen> with TickerProviderStateM
                 sizeIndex = i;
               });
             },
-            child: _sizeWidget(sizes[i], isSelected: i == sizeIndex ? true : false),
+            child: _sizeWidget(sizes[i].toString(), isSelected: i == sizeIndex ? true : false),
           )
       );
       if (i != sizes.length - 1) {
@@ -289,15 +426,7 @@ class _ProductScreenState extends State<ProductScreen> with TickerProviderStateM
       padding: EdgeInsets.only(bottom: 35),
       child: ElevatedButton(
         onPressed: () {
-          Fluttertoast.showToast(
-            msg: "محصول به سبدخرید شما اضافه شد",
-            toastLength: Toast.LENGTH_LONG,
-            timeInSecForIosWeb: 1,
-            gravity: ToastGravity.CENTER,
-            backgroundColor: Colors.green,
-            textColor: Colors.white,
-            fontSize: 16.0,
-          );
+          _addToCart();
         },
         style: ElevatedButton.styleFrom(
             primary: Color(0xffE6123D),
@@ -327,6 +456,49 @@ class _ProductScreenState extends State<ProductScreen> with TickerProviderStateM
                 ],
               ),
             ),
+      ),
+    );
+  }
+
+  Widget _outOfStockButton() {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 35),
+      child: ElevatedButton(
+        onPressed: () {
+          Fluttertoast.showToast(
+            msg: "نداریم دیگه مهندس",
+            toastLength: Toast.LENGTH_LONG,
+            timeInSecForIosWeb: 1,
+            gravity: ToastGravity.CENTER,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
+        },
+        style: ElevatedButton.styleFrom(
+            primary: Color(0xffE6123D),
+            shadowColor: Colors.black.withOpacity(0.5),
+            fixedSize: Size(250, 50),
+            shape: new RoundedRectangleBorder(
+              borderRadius: new BorderRadius.circular(10),
+            )
+        ),
+        child:
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 10),
+          child: Stack(
+            children: [
+              Align(
+                alignment: Alignment.center,
+                child: Text(
+                  "کالا ناموجود می‌باشد  :(",
+                  style: TextStyle(fontFamily: 'Beheshti', fontWeight: FontWeight.bold, fontSize: 17),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -438,16 +610,28 @@ class _ProductScreenState extends State<ProductScreen> with TickerProviderStateM
                           children: <Widget>[
                             GestureDetector(
                               onTap: () {
-                                Navigator.of(context).push(CupertinoPageRoute(builder: (context) => CategoryScreen(product["category_id"].toString().split("_")[0])));
+                                Navigator.of(context).push(CupertinoPageRoute(builder: (context) => CategoryScreen(product["sub_category"].toString().split("_")[0])));
                               },
-                              child: Text(
-                                  product["category"],
+                              child: category.isNotEmpty ? Text(
+                                  category["name"],
                                   style: TextStyle(
                                       fontFamily: 'Beheshti',
                                       fontWeight: FontWeight.normal,
                                       fontSize: 12,
                                       color: Colors.lightBlue
                                   )
+                              ) : SizedBox(
+                                width: 70,
+                                height: 15,
+                                child: Shimmer.fromColors(
+                                    baseColor: Colors.white,
+                                    highlightColor: Colors.grey.shade100,
+                                    child: Container(
+                                      width: 500.0,
+                                      height: 500.0,
+                                      color: Colors.white,
+                                    )
+                                ),
                               ),
                             ),
                             SizedBox(width: 5),
@@ -463,17 +647,29 @@ class _ProductScreenState extends State<ProductScreen> with TickerProviderStateM
                             SizedBox(width: 5),
                             GestureDetector(
                               onTap: () {
-                                Navigator.of(context).push(CupertinoPageRoute(builder: (context) => SubCategoryScreen(product["category_id"])));
+                                Navigator.of(context).push(CupertinoPageRoute(builder: (context) => SubCategoryScreen(product["sub_category"])));
                               },
-                              child: Text(
-                                product["sub_category"],
+                              child: category.isNotEmpty ? Text(
+                                  category["sub_categories"][product["sub_category"].split("_")[1]]["name"],
                                 style: TextStyle(
                                     fontFamily: 'Beheshti',
                                     fontWeight: FontWeight.normal,
                                     fontSize: 12,
                                     color: Colors.lightBlue
                                 )
-                            ),
+                            ) : SizedBox(
+                                width: 70,
+                                height: 15,
+                                child: Shimmer.fromColors(
+                                    baseColor: Colors.white,
+                                    highlightColor: Colors.grey.shade100,
+                                    child: Container(
+                                      width: 500.0,
+                                      height: 500.0,
+                                      color: Colors.white,
+                                    )
+                                ),
+                              ),
                             )
                           ],
                         ),
@@ -485,14 +681,25 @@ class _ProductScreenState extends State<ProductScreen> with TickerProviderStateM
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
-                            Text(
-                                product["seller"],
+                            product.isNotEmpty ? Text(product["seller_name"],
                                 style: TextStyle(
                                     fontFamily: 'Beheshti',
                                     fontWeight: FontWeight.normal,
                                     fontSize: 12,
                                     color: Color(0xFF016FA0)
                                 )
+                            ) : SizedBox(
+                              width: 60.0,
+                              height: 15.0,
+                              child: Shimmer.fromColors(
+                                  baseColor: Colors.grey.shade50,
+                                  highlightColor: Colors.grey.shade100,
+                                  child: Container(
+                                    width: 500.0,
+                                    height: 500.0,
+                                    color: Colors.white,
+                                  )
+                              ),
                             ),
                             SizedBox(width: 5),
                             Icon(LineIcons.user, size: 15, color: Color(0xFF016FA0)
@@ -510,7 +717,7 @@ class _ProductScreenState extends State<ProductScreen> with TickerProviderStateM
                       children: <Widget>[
                         Container(
                           constraints: BoxConstraints(maxWidth: 200),
-                          child: Text(
+                          child: product.isNotEmpty ? Text(
                               product["name"],
                               style: TextStyle(
                                   fontFamily: 'Beheshti',
@@ -518,16 +725,28 @@ class _ProductScreenState extends State<ProductScreen> with TickerProviderStateM
                                   fontSize: 20,
                                   color: Colors.black
                               )
+                          ) : SizedBox(
+                            width: 200.0,
+                            height: 75.0,
+                            child: Shimmer.fromColors(
+                                baseColor: Colors.grey.shade50,
+                                highlightColor: Colors.grey.shade100,
+                                child: Container(
+                                  width: 500.0,
+                                  height: 500.0,
+                                  color: Colors.white,
+                                )
+                            ),
                           ),
                         ),
-                        Column(
+                        product.isNotEmpty ? Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: <Widget>[
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: <Widget>[
                                 Text(
-                                    product["price"],
+                                    persianNumber(product["price"]),
                                     style: TextStyle(
                                         fontFamily: 'Beheshti',
                                         fontWeight: FontWeight.w600,
@@ -547,9 +766,21 @@ class _ProductScreenState extends State<ProductScreen> with TickerProviderStateM
                               ],
                             ),
                             Row(
-                              children: getStars(product["star"]),
+                              children: product.isNotEmpty ? getStars(product["stars"]) : [],
                             ),
                           ],
+                        ) : SizedBox(
+                          width: 75.0,
+                          height: 25,
+                          child: Shimmer.fromColors(
+                              baseColor: Colors.grey.shade50,
+                              highlightColor: Colors.grey.shade100,
+                              child: Container(
+                                width: 500.0,
+                                height: 500.0,
+                                color: Colors.white,
+                              )
+                          ),
                         ),
                       ],
                     ),
@@ -557,15 +788,15 @@ class _ProductScreenState extends State<ProductScreen> with TickerProviderStateM
                   SizedBox(
                     height: 30,
                   ),
-                  product["has_color"] ? _availableColor() : Container(),
-                  product["has_color"] && product["has_size"] ? SizedBox(
+                  product.isNotEmpty ? (product["has_color"] ? _availableColor() : Container()) : Container(),
+                  product.isNotEmpty ? (product["has_color"] && product["has_size"] ? SizedBox(
                     height: 15,
-                  ) : Container(),
-                  product["has_size"] ? _availableSize() : Container(),
-                  product["has_color"] || product["has_size"] ? SizedBox(
+                  ) : Container()) : Container(),
+                  product.isNotEmpty ? (product["has_size"] ? _availableSize() : Container()) : Container(),
+                  product.isNotEmpty ? (product["has_color"] || product["has_size"] ? SizedBox(
                     height: 30,
-                  ) : Container(),
-                  Stack(
+                  ) : Container()) : Container(),
+                  product.isNotEmpty ? Stack(
                     children: [
                       Align(
                         alignment: Alignment.centerRight,
@@ -584,11 +815,23 @@ class _ProductScreenState extends State<ProductScreen> with TickerProviderStateM
                         child: Icon(CupertinoIcons.list_bullet, size: 25),
                       )
                     ],
+                  ) : SizedBox(
+                    width: MediaQuery.of(context).size.width - 40,
+                    height: 250.0,
+                    child: Shimmer.fromColors(
+                        baseColor: Colors.white,
+                        highlightColor: Colors.grey.shade100,
+                        child: Container(
+                          width: 500.0,
+                          height: 500.0,
+                          color: Colors.white,
+                        )
+                    ),
                   ),
-                  SizedBox(
+                  product.isNotEmpty ?SizedBox(
                     height: 15,
-                  ),
-                  _description()
+                  ) : Container(),
+                  product.isNotEmpty ? _description() : Container()
                 ],
               ),
             ),
@@ -598,7 +841,7 @@ class _ProductScreenState extends State<ProductScreen> with TickerProviderStateM
     );
   }
 
-  FloatingActionButton _flotingButton() {
+  FloatingActionButton _floatingButton() {
     return FloatingActionButton(
       onPressed: () {},
       backgroundColor: Colors.indigoAccent,
@@ -637,30 +880,49 @@ class _ProductScreenState extends State<ProductScreen> with TickerProviderStateM
                 Align(
                   alignment: Alignment.centerLeft,
                   child: GestureDetector(
-                    onTap: () {
-                      setState(() {
+                    onTap: () async {
+                      await Socket.connect("192.168.1.7", 4536).then((serverSocket) async {
+                        String token = await getToken() ?? "nothing";
                         if (heart == LineIcons.heart) {
-                          heart = LineIcons.heartAlt;
-                          Fluttertoast.showToast(
-                            msg: "محصول به علاقه‌مندی‌های شما اضافه شد",
-                            toastLength: Toast.LENGTH_LONG,
-                            timeInSecForIosWeb: 1,
-                            gravity: ToastGravity.CENTER,
-                            backgroundColor: Colors.redAccent,
-                            textColor: Colors.white,
-                            fontSize: 16.0,
-                          );
+                          serverSocket.write("AUTH=" + token + ";ADD_FAVORITE=" + productId + "\n");
+                          serverSocket.flush();
+                          serverSocket.listen((response) async {
+                            String result = utf8.decode(response);
+                            if (result == "DONE") {
+                              setState(() {
+                                heart = LineIcons.heartAlt;
+                                Fluttertoast.showToast(
+                                  msg: "محصول به علاقه‌مندی‌های شما اضافه شد",
+                                  toastLength: Toast.LENGTH_LONG,
+                                  timeInSecForIosWeb: 1,
+                                  gravity: ToastGravity.CENTER,
+                                  backgroundColor: Colors.redAccent,
+                                  textColor: Colors.white,
+                                  fontSize: 16.0,
+                                );
+                              });
+                            }
+                          });
                         } else {
-                          heart = LineIcons.heart;
-                          Fluttertoast.showToast(
-                            msg: "محصول از علاقه‌مندی‌های شما حذف شد",
-                            toastLength: Toast.LENGTH_LONG,
-                            timeInSecForIosWeb: 1,
-                            gravity: ToastGravity.CENTER,
-                            backgroundColor: Colors.redAccent,
-                            textColor: Colors.white,
-                            fontSize: 16.0,
-                          );
+                          serverSocket.write("AUTH=" + token + ";REMOVE_FAVORITE=" + productId + "\n");
+                          serverSocket.flush();
+                          serverSocket.listen((response) async {
+                            String result = utf8.decode(response);
+                            if (result == "DONE") {
+                              setState(() {
+                                heart = LineIcons.heart;
+                                Fluttertoast.showToast(
+                                  msg: "محصول از علاقه‌مندی‌های شما حذف شد",
+                                  toastLength: Toast.LENGTH_LONG,
+                                  timeInSecForIosWeb: 1,
+                                  gravity: ToastGravity.CENTER,
+                                  backgroundColor: Colors.redAccent,
+                                  textColor: Colors.white,
+                                  fontSize: 16.0,
+                                );
+                              });
+                            }
+                          });
                         }
                       });
                     },
@@ -693,7 +955,7 @@ class _ProductScreenState extends State<ProductScreen> with TickerProviderStateM
                 ),
                 Align(
                   alignment: Alignment.bottomCenter,
-                  child: user["user_id"] == product["owner"] ? _editButton() : _buyButton(),
+                  child: (user.isNotEmpty && product.isNotEmpty) ? (user["user_id"] == product["seller"] ? _editButton() : ((product["stock"] != 0) ? _buyButton() : _outOfStockButton())) : Container(),
                 )
               ],
             ),
