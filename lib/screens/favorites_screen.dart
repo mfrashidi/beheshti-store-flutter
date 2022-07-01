@@ -1,11 +1,16 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:nama_kala/screens/product_screen.dart';
+import 'package:nama_kala/utils/converter.dart';
+import 'package:shimmer/shimmer.dart';
 
 List<dynamic> items = [];
 Map<String, dynamic> products = {};
@@ -18,19 +23,65 @@ class FavoritesScreen extends StatefulWidget {
 
 class _FavoritesScreenState extends State<FavoritesScreen> {
 
-  Future<void> _getProducts() async {
-    final String response = await rootBundle.loadString('assets/products.json');
-    final data = await json.decode(response);
-    setState(() {
-      products = data;
+
+  Future<Map<String, dynamic>> getProduct(String productId) async {
+    Completer<Map<String, dynamic>> _completer = Completer<Map<String, dynamic>>();
+    await Socket.connect("192.168.1.7", 4536).then((serverSocket) async {
+      String token = await getToken() ?? "nothing";
+      serverSocket.write("AUTH=" + token + ";GET_PRODUCT=" + productId + "\n");
+      serverSocket.flush();
+      serverSocket.listen((response) async {
+        Map<String, dynamic> data = json.decode(utf8.decode(response));
+        data["image"] = await _getImage(data["image"]);
+        _completer.complete(data);
+      });
     });
+
+    return _completer.future;
+  }
+
+  Future<int> _getImageLength(String imageID) async {
+    Completer<int> _completer = Completer<int>();
+    await Socket.connect("192.168.1.7", 4536).then((serverSocket) async {
+      String token = await getToken() ?? "nothing";
+      serverSocket.write("AUTH=" + token + ";GET_IMAGE_LENGTH=" + imageID + "\n");
+      serverSocket.flush();
+      serverSocket.listen((response) async {
+        _completer.complete(int.parse(String.fromCharCodes(response)));
+      });
+    });
+    return _completer.future;
+  }
+
+  Future<String> _getImage(String imageID) async {
+    Completer<String> _completer = Completer<String>();
+    String result = "";
+    int length = await _getImageLength(imageID);
+    await Socket.connect("192.168.1.7", 4536).then((serverSocket) async {
+      String token = await getToken() ?? "nothing";
+      serverSocket.write("AUTH=" + token + ";GET_IMAGE=" + imageID + "\n");
+      serverSocket.flush();
+      serverSocket.listen((response) async {
+        result += await String.fromCharCodes(response);
+        if (result.length >= length) {
+          _completer.complete(result);
+        }
+      });
+    });
+    return _completer.future;
   }
 
   Future<void> _getFavorites() async {
-    final String response = await rootBundle.loadString('assets/user.json');
-    final data = await json.decode(response);
-    setState(() {
-      items = data["favorites"];
+    await Socket.connect("192.168.1.7", 4536).then((serverSocket) async {
+      String token = await getToken() ?? "nothing";
+      serverSocket.write("AUTH=" + token + ";GET_ME\n");
+      serverSocket.flush();
+      serverSocket.listen((response) async {
+        final data = await json.decode(utf8.decode(response));
+        setState(() {
+          items = data["favorites"];
+        });
+      });
     });
   }
 
@@ -38,7 +89,6 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   void initState() {
     super.initState();
     _getFavorites();
-    _getProducts();
   }
 
   Widget _favoriteProducts() {
@@ -50,14 +100,16 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
             padding: EdgeInsets.all(20),
             itemCount: items.length,
             itemBuilder: (context, index) {
-              Map<String, dynamic> product = products[items[index]];
               return AnimationConfiguration.staggeredList(
                 position: index,
                 duration: const Duration(milliseconds: 375),
                 child: SlideAnimation(
                   verticalOffset: -50.0,
                   child: FadeInAnimation(
-                      child: Container(
+                      child: FutureBuilder<Map<String, dynamic>>(
+                          future: getProduct(items[index]),
+                          builder: (context, AsyncSnapshot<Map<String, dynamic>> product) {
+                          return Container(
                         padding: EdgeInsets.all(10),
                         decoration: BoxDecoration(
                           color: Colors.white,
@@ -81,12 +133,24 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                             mainAxisSpacing: 30,
                           ),
                           children: [
-                            GestureDetector(
+                            product.hasData ? GestureDetector(
                               onTap: () {
                                 Navigator.of(context).push(CupertinoPageRoute(builder: (context) => ProductScreen(items[index])));
                               },
-                              child: new Image.asset(product["image"]),
-                            ),
+                              child: Image.memory(Uint8List.fromList(base64Decode(product.data!["image"]))),
+                            ) : SizedBox(
+                                width: 10.0,
+                                height: 10.0,
+                                child: Shimmer.fromColors(
+                                baseColor: Colors.white,
+                                highlightColor: Colors.grey.shade100,
+                                child: Container(
+                                width: 10.0,
+                                height: 10.0,
+                                color: Colors.white,
+                                )
+                                ),
+                                ),
                             Stack(
                               children: [
                                 Align(
@@ -95,17 +159,29 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                                     physics: NeverScrollableScrollPhysics(),
                                     shrinkWrap: true,
                                     children: [
-                                      Text(
-                                          product["name"],
+                                      product.hasData ? Text(
+                                          product.data!["name"],
                                           style: TextStyle(
                                               fontFamily: 'Beheshti',
                                               fontWeight: FontWeight.bold,
                                               fontSize: 15,
                                               color: Colors.black
                                           )
+                                      ) : SizedBox(
+                                        width: 10.0,
+                                        height: 10.0,
+                                        child: Shimmer.fromColors(
+                                            baseColor: Colors.white,
+                                            highlightColor: Colors.grey.shade100,
+                                            child: Container(
+                                              width: 10.0,
+                                              height: 10.0,
+                                              color: Colors.white,
+                                            )
+                                        ),
                                       ),
                                       SizedBox(height: 5),
-                                      Row(
+                                      product.hasData ? Row(
                                         children: [
                                           Icon(
                                             Icons.check_circle,
@@ -123,14 +199,33 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                                               )
                                           ),
                                         ],
-                                      ),
+                                      ) : SizedBox(height: 20),
                                       SizedBox(height: 15),
                                       Stack(
                                         children: [
                                           Align(
                                             alignment: Alignment.centerRight,
                                             child: GestureDetector(
-                                              onTap: () {
+                                              onTap: () async {
+                                                await Socket.connect("192.168.1.7", 4536).then((serverSocket) async {
+                                                  String token = await getToken() ?? "nothing";
+                                                  serverSocket.write("AUTH=" + token + ";REMOVE_FAVORITE=" + items[index] + "\n");
+                                                  serverSocket.flush();
+                                                  serverSocket.listen((response) async {
+                                                    String result = utf8.decode(response);
+                                                    if (result == "DONE") {
+                                                      Fluttertoast.showToast(
+                                                        msg: "محصول از علاقه‌مندی‌های شما حذف شد",
+                                                        toastLength: Toast.LENGTH_LONG,
+                                                        timeInSecForIosWeb: 1,
+                                                        gravity: ToastGravity.CENTER,
+                                                        backgroundColor: Colors.redAccent,
+                                                        textColor: Colors.white,
+                                                        fontSize: 16.0,
+                                                      );
+                                                    }
+                                                  });
+                                                });
                                                 setState(() {
                                                   items.remove(items[index]);
                                                 });
@@ -143,14 +238,26 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                                             child: Row(
                                               mainAxisAlignment: MainAxisAlignment.end,
                                               children: <Widget>[
-                                                Text(
-                                                    product["price"],
+                                                product.hasData ? Text(
+                                                    persianNumber(product.data!["price"]),
                                                     style: TextStyle(
                                                         fontFamily: 'Beheshti',
                                                         fontWeight: FontWeight.w600,
                                                         fontSize: 18,
                                                         color: Colors.black
                                                     )
+                                                ) : SizedBox(
+                                                  width: 50.0,
+                                                  height: 10.0,
+                                                  child: Shimmer.fromColors(
+                                                      baseColor: Colors.white,
+                                                      highlightColor: Colors.grey.shade100,
+                                                      child: Container(
+                                                        width: 10.0,
+                                                        height: 10.0,
+                                                        color: Colors.white,
+                                                      )
+                                                  ),
                                                 ),
                                                 Text(
                                                     "تومان",
@@ -174,10 +281,10 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                             )
                           ],
                         ),
-                      )
+                      );}
                   ),
                 ),
-              );
+              ));
             }
         )
     );
