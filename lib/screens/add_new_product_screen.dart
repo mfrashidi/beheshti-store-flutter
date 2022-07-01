@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/cupertino.dart';
@@ -9,7 +11,17 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../utils/converter.dart';
+import 'category_screen.dart';
+
 Map<String, dynamic> product = {};
+
+TextEditingController nameController = TextEditingController();
+TextEditingController sellerNameController = TextEditingController();
+TextEditingController priceController = TextEditingController();
+TextEditingController stockController = TextEditingController();
+
+
 class AddNewProductScreen extends StatefulWidget {
   AddNewProductScreen([Map<String, dynamic> p = const {}]) {
     product = p;
@@ -21,17 +33,20 @@ class AddNewProductScreen extends StatefulWidget {
 }
 
 List<String> items = [];
+List<String> itemIDs = [];
 String? selectedValue;
 
 Map<String, Color> colors = {};
 Map<String, String> attributes = {};
-List<int> sizes = [];
+List<double> sizes = [];
 
 Color pickerColor = Color(0xff443a49);
 Color currentColor = Color(0xff443a49);
 
 TextEditingController colorNameController = TextEditingController();
 TextEditingController sizeController = TextEditingController();
+
+int categoryIndex = -1;
 
 class _AddNewProductScreenState extends State<AddNewProductScreen> {
 
@@ -60,16 +75,114 @@ class _AddNewProductScreenState extends State<AddNewProductScreen> {
     return number;
   }
 
+  Future<int> _getImageLength(String imageID) async {
+    Completer<int> _completer = Completer<int>();
+    await Socket.connect("192.168.1.7", 4536).then((serverSocket) async {
+      String token = await getToken() ?? "nothing";
+      serverSocket.write("AUTH=" + token + ";GET_IMAGE_LENGTH=" + imageID + "\n");
+      serverSocket.flush();
+      serverSocket.listen((response) async {
+        _completer.complete(int.parse(String.fromCharCodes(response)));
+      });
+    });
+    return _completer.future;
+  }
+
+  Future<String> _getImageBase64(String imageID) async {
+    Completer<String> _completer = Completer<String>();
+    String result = "";
+    int length = await _getImageLength(imageID);
+    await Socket.connect("192.168.1.7", 4536).then((serverSocket) async {
+      String token = await getToken() ?? "nothing";
+      serverSocket.write("AUTH=" + token + ";GET_IMAGE=" + imageID + "\n");
+      serverSocket.flush();
+      serverSocket.listen((response) async {
+        result += await String.fromCharCodes(response);
+        if (result.length >= length) {
+          _completer.complete(result);
+        }
+      });
+    });
+    return _completer.future;
+  }
+
   Future<void> _getCategories() async {
-    final String response = await rootBundle.loadString(
-        'assets/categories.json');
-    final data = await json.decode(response);
-    setState(() {
-      Map<String, dynamic> categoriesMap = data;
-      categoriesMap.forEach((key, value) {
-        Map<String, dynamic> subCategories = value["sub_categories"];
-        subCategories.forEach((k, v) {
-          items.add(value["name"] + "، " + v["name"]);
+    await Socket.connect("192.168.1.7", 4536).then((serverSocket) async {
+      String token = await getToken() ?? "nothing";
+      serverSocket.write("AUTH=" + token + ";GET_CATEGORIES\n");
+      serverSocket.flush();
+      serverSocket.listen((response) async {
+        final data = await json.decode(utf8.decode(response));
+        int i = 0;
+        setState(() {
+          Map<String, dynamic> categoriesMap = data;
+          items = [];
+          itemIDs = [];
+          categoriesMap.forEach((key, value) {
+            Map<String, dynamic> subCategories = value["sub_categories"];
+            subCategories.forEach((k, v) {
+              items.add(value["name"] + "، " + v["name"]);
+              itemIDs.add(key + "_" + k);
+              if (product["sub_category"] == key + "_" + k) {
+                categoryIndex = i;
+              }
+              i++;
+            });
+          });
+        });
+      });
+    });
+  }
+
+  Future<void> _save() async{
+    await Socket.connect("192.168.1.7", 4536).then((serverSocket) async {
+      String token = await getToken() ?? "nothing";
+      List<int> imageBytes = _image?.readAsBytesSync() as List<int>;
+      List<Map<String, String>> colorsMap = [];
+      for (String name in colors.keys) {
+        colorsMap.add({
+          "name": unNormalize(name),
+          "code": colors[name].toString().replaceAll("Color(", "").replaceAll(")", "")
+        });
+      }
+      Map<String, String> attrs = {};
+      for (String key in attributes.keys) {
+        attrs[unNormalize(key)] = unNormalize(attributes[key]!);
+      }
+      Map<String, dynamic> pr = {
+        "name": unNormalize(nameController.text),
+        "stock": int.parse(stockController.text),
+        "image": _image != null ? base64Encode(imageBytes) : product["image"],
+        "images_count": 0,
+        "category": items[categoryIndex],
+        "sub_category": itemIDs[categoryIndex],
+        "stars": product.isNotEmpty ? product["stars"] : 0,
+        "has_color": colors.isNotEmpty,
+        "colors": colorsMap,
+        "has_size": sizes.isNotEmpty,
+        "sizes": sizes,
+        "description": attrs,
+        "seller": product.isNotEmpty ? product["seller"] : "",
+        "seller_name": unNormalize(sellerNameController.text),
+        "product_id": product.isNotEmpty ? product["product_id"] : "",
+        "price": int.parse(priceController.text)
+      };
+      serverSocket.write("AUTH=" + token + ";UPDATE_PRODUCT="+json.encode(pr)+"\n");
+      serverSocket.flush();
+      serverSocket.listen((response) async {
+        setState(() {
+          if (utf8.decode(response) == "DONE") {
+            Fluttertoast.showToast(
+              msg: "کالای شما با موفقیت ثبت شد",
+              toastLength: Toast.LENGTH_LONG,
+              timeInSecForIosWeb: 1,
+              gravity: ToastGravity.CENTER,
+              backgroundColor: Colors.green,
+              textColor: Colors.white,
+              fontSize: 16.0,
+            );
+            Navigator.of(context).pop();
+          }
         });
       });
     });
@@ -78,17 +191,31 @@ class _AddNewProductScreenState extends State<AddNewProductScreen> {
   @override
   void initState() {
     super.initState();
+    categoryIndex = -1;
     if (product.isEmpty) {
       colors = {};
       sizes = [];
       items = [];
       attributes = {};
     } else {
+      WidgetsBinding.instance?.addPostFrameCallback((_) async {
+        product["image"] = await _getImageBase64(product["image"]);
+      });
+      nameController.text = product["name"];
+      sellerNameController.text = product["seller_name"];
+      priceController.text = product["price"].toString();
+      stockController.text = product["stock"].toString();
+      colors = {};
       for (var i in product["colors"]) {
         colors[i["name"]] = Color(int.parse(i["code"]));
       }
+      attributes = {};
       for (var i in product["description"].keys) {
         attributes[i] = product["description"][i];
+      }
+      sizes = [];
+      for (var i in product["sizes"]) {
+        sizes.add(i);
       }
     }
     _getCategories();
@@ -311,7 +438,7 @@ class _AddNewProductScreenState extends State<AddNewProductScreen> {
                 ),
                 onPressed: () {
                   setState(() {
-                    sizes.add(int.parse(sizeController.text));
+                    sizes.add(double.parse(sizeController.text));
                   });
                   Navigator.of(context).pop();
                 },
@@ -461,7 +588,15 @@ class _AddNewProductScreenState extends State<AddNewProductScreen> {
         shrinkWrap: true,
         itemCount: colors.length,
         itemBuilder: (context, index) {
-          return _colorWidget(colorKeys[index], colors[colorKeys[index]]);
+          return GestureDetector(
+            child: _colorWidget(colorKeys[index], colors[colorKeys[index]]),
+            onLongPress: (){
+              setState(() {
+                colors.remove(colorKeys[index]);
+                colorKeys.removeAt(index);
+              });
+            },
+          );
         }),
       ],
     );
@@ -470,7 +605,19 @@ class _AddNewProductScreenState extends State<AddNewProductScreen> {
   Widget _availableSizes() {
     List<Widget> sizesWidgets = [];
     for (var size in sizes) {
-      sizesWidgets.add(Padding(padding: EdgeInsets.symmetric(vertical: 2, horizontal: 5),child: _sizeWidget(persianize(size.toString())),));
+      sizesWidgets.add(
+        GestureDetector(
+          child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 2, horizontal: 5),
+              child: _sizeWidget(persianize(size.toString()))
+          ),
+          onLongPress: () {
+            setState(() {
+              sizes.removeAt(sizes.indexOf(size));
+            });
+          },
+        )
+      );
     }
     return ListView(
       physics: NeverScrollableScrollPhysics(),
@@ -569,7 +716,15 @@ class _AddNewProductScreenState extends State<AddNewProductScreen> {
           itemCount: attributes.length,
           shrinkWrap: true,
           itemBuilder: (context, index) {
-            return _attributeWidget(keys[index], attributes[keys[index]]);
+            return GestureDetector(
+              child: _attributeWidget(keys[index], attributes[keys[index]]),
+              onLongPress: () {
+                setState(() {
+                  attributes.remove(keys[index]);
+                  keys.remove(index);
+                });
+              },
+            );
           }
           )
       ],
@@ -618,7 +773,7 @@ class _AddNewProductScreenState extends State<AddNewProductScreen> {
         Container(
           child: _image != null
               ? Image.file(_image!, fit: BoxFit.cover)
-              : product.isNotEmpty ? new Image.asset(product["image"], fit: BoxFit.cover) : Text('عکسی انتخاب نشده است',
+              : product.isNotEmpty && (product["image"] as String).length > 1000 ? Image.memory(Uint8List.fromList(base64Decode(product["image"])), fit: BoxFit.cover) : Text('عکسی انتخاب نشده است',
               style: TextStyle(
                   fontFamily: 'Beheshti',
                   fontWeight: FontWeight.normal,
@@ -633,7 +788,6 @@ class _AddNewProductScreenState extends State<AddNewProductScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
           title: Text(
@@ -665,15 +819,7 @@ class _AddNewProductScreenState extends State<AddNewProductScreen> {
                 padding: EdgeInsets.only(left: 20),
                 child: GestureDetector(
                   onTap: () {
-                    Fluttertoast.showToast(
-                      msg: "کالای شما با موفقیت ثبت شد",
-                      toastLength: Toast.LENGTH_LONG,
-                      timeInSecForIosWeb: 1,
-                      gravity: ToastGravity.CENTER,
-                      backgroundColor: Colors.green,
-                      textColor: Colors.white,
-                      fontSize: 16.0,
-                    );
+                    _save();
                   },
                   child: Text(
                       "ثبت",
@@ -694,8 +840,19 @@ class _AddNewProductScreenState extends State<AddNewProductScreen> {
         child: ListView(
           shrinkWrap: true,
           children: [
+            Text(
+              "میتوانید با نگه داشتن هرکدام از ویژگی ها، آن را حذف کنید",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  fontFamily: 'Beheshti',
+                  fontWeight: FontWeight.normal,
+                  fontSize: 15,
+                  color: Colors.black.withOpacity(0.5)
+              ),
+            ),
+            SizedBox(height: 40),
           TextFormField (
-            initialValue: product.isNotEmpty ? product["name"] : "",
+            controller: nameController,
             decoration: InputDecoration(
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -746,10 +903,11 @@ class _AddNewProductScreenState extends State<AddNewProductScreen> {
             ),
             ))
                 .toList(),
-            value: selectedValue,
+            value: categoryIndex != -1 ? items[categoryIndex] : selectedValue,
             onChanged: (value) {
             setState(() {
             selectedValue = value as String;
+            categoryIndex = items.indexOf(value);
             });
             },
             buttonHeight: 60,
@@ -766,7 +924,7 @@ class _AddNewProductScreenState extends State<AddNewProductScreen> {
           ),
             SizedBox(height: 30),
             TextFormField (
-              initialValue: product.isNotEmpty ? product["seller"] : "",
+              controller: sellerNameController,
               decoration: InputDecoration(
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -788,7 +946,7 @@ class _AddNewProductScreenState extends State<AddNewProductScreen> {
             ),
             SizedBox(height: 30),
             TextFormField (
-              initialValue: product.isNotEmpty ? product["price"].replaceAll(",", "") : "",
+              controller: priceController,
               decoration: InputDecoration(
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -813,7 +971,8 @@ class _AddNewProductScreenState extends State<AddNewProductScreen> {
               ],
             ),
             SizedBox(height: 30),
-            TextField (
+            TextFormField (
+              controller: stockController,
               decoration: InputDecoration(
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -845,6 +1004,7 @@ class _AddNewProductScreenState extends State<AddNewProductScreen> {
             _availableColors(),
             SizedBox(height: 30),
             _availableSizes(),
+            SizedBox(height: 30),
             _attributes(),
             SizedBox(height: 30),
             _getImage()
