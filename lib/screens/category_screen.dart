@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -7,13 +9,25 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:nama_kala/screens/product_screen.dart';
 import 'package:nama_kala/screens/sub_category_products.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shimmer/shimmer.dart';
 
 import '../assets/item_card.dart';
 
 String categoryId = "";
 Map<String, dynamic> category = {};
 Map<String, dynamic> products = {};
+Map<String, List<String>> productIDs = {};
 
+final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+
+Future<String?> getToken() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final SharedPreferences prefs = await _prefs;
+  final String token = prefs.getString('token') ?? "empty";
+
+  return token;
+}
 
 class CategoryScreen extends StatefulWidget {
   CategoryScreen(String id) {
@@ -26,14 +40,6 @@ class CategoryScreen extends StatefulWidget {
 
 class _CategoryScreenState extends State<CategoryScreen>{
 
-  Future<void> _getCategory() async {
-    final String response = await rootBundle.loadString('assets/categories.json');
-    final data = await json.decode(response);
-    setState(() {
-      category = data[categoryId];
-    });
-  }
-
   Future<void> _getProducts() async {
     final String response = await rootBundle.loadString('assets/products.json');
     final data = await json.decode(response);
@@ -42,20 +48,59 @@ class _CategoryScreenState extends State<CategoryScreen>{
     });
   }
 
+  Future<void> _getProductsByCategory() async {
+    String result;
+    Map<String, dynamic> subCategories = {};
+
+    await Socket.connect("192.168.1.7", 4536).then((serverSocket) async {
+      String token = await getToken() ?? "nothing";
+      serverSocket.write("AUTH=" + token + ";GET_CATEGORY=" + categoryId + "\n");
+      serverSocket.flush();
+      serverSocket.listen((response) async {
+        result = utf8.decode(response);
+        final data = await json.decode(result);
+        setState(() {
+          category = data;
+          subCategories = category["sub_categories"];
+          for (String sub in subCategories.keys) {
+            List<dynamic> pIDs = json.decode(subCategories[sub]["products"]);
+            productIDs[sub] = [];
+            for (var pID in pIDs) {
+              productIDs[sub]?.add(pID.toString());
+            }
+          }
+        });
+      });
+    });
+  }
+
+  Future<Map<String, dynamic>> getProduct(String productId) async {
+    Completer<Map<String, dynamic>> _completer = Completer<Map<String, dynamic>>();
+    await Socket.connect("192.168.1.7", 4536).then((serverSocket) async {
+      String token = await getToken() ?? "nothing";
+      serverSocket.write("AUTH=" + token + ";GET_PRODUCT=" + productId + "\n");
+      serverSocket.flush();
+      serverSocket.listen((response) async {
+        _completer.complete(json.decode(utf8.decode(response)));
+      });
+    });
+
+    return _completer.future;
+  }
+
+
   @override
   void initState() {
     super.initState();
-    _getCategory();
-    _getProducts();
+
+    WidgetsBinding.instance?.addPostFrameCallback((_) async {
+      await _getProducts();
+      await _getProductsByCategory();
+    });
   }
 
   Widget subCategoriesWidget(String subCategory) {
-    Map<String, dynamic> filteredProducts = Map.from(products)..removeWhere((k, v) => v["category_id"] != categoryId + "_" + subCategory);
-    List<String> productIds = [];
-    for (var k in filteredProducts.keys) {
-      productIds.add(k);
-    }
-    return productIds.isEmpty ? Container() : ListView(
+    return productIDs[subCategory]?.length == 0 ? Container() : ListView(
       shrinkWrap: true,
       physics: NeverScrollableScrollPhysics(),
       children: [
@@ -110,19 +155,19 @@ class _CategoryScreenState extends State<CategoryScreen>{
               scrollDirection: Axis.horizontal,
               physics: BouncingScrollPhysics(),
               padding: EdgeInsets.symmetric(vertical: 20),
-              itemCount: productIds.length,
+              itemCount: productIDs[subCategory]?.length,
               itemBuilder: (context, index) {
                 return AnimationConfiguration.staggeredList(
                   position: index,
                   duration: const Duration(milliseconds: 375),
                   child: Padding(
-                      padding: EdgeInsets.only(right: index == 0 ? 25 : 5, left: index == productIds.length - 1 ? 25 : 5),
+                      padding: EdgeInsets.only(right: index == 0 ? 25 : 5, left: index == (productIDs[subCategory]?.length)! - 1 ? 25 : 5),
                       child: SlideAnimation(
                         horizontalOffset: 50.0,
                         child: FadeInAnimation(
                             child: GestureDetector(
                               onTap: () {
-                                Navigator.of(context).push(CupertinoPageRoute(builder: (context) => ProductScreen(productIds[index])));
+                                Navigator.of(context).push(CupertinoPageRoute(builder: (context) => ProductScreen(productIDs[subCategory]![index])));
                               },
                               child: Container(
                                 width: 165,
@@ -138,11 +183,34 @@ class _CategoryScreenState extends State<CategoryScreen>{
                                     ),
                                   ],
                                 ),
-                                padding: EdgeInsets.all(10),
-                                child: products.isNotEmpty ? getItemCard(
-                                    products[productIds[index]]["image"],
-                                    products[productIds[index]]["name"],
-                                    products[productIds[index]]["price"]) : Container(),
+                                child: FutureBuilder<Map<String, dynamic>>(
+                                        future: getProduct(productIDs[subCategory]![index]),
+                                        builder: (context, AsyncSnapshot<Map<String, dynamic>> product) {
+                                          if (product.hasData) {
+                                            return Container(
+                                              padding: EdgeInsets.all(10),
+                                              child: getItemCard(
+                                                  product.data?["image"],
+                                                  product.data?["name"],
+                                                  product.data?["price"])
+                                            );
+                                          } else {
+                                            return SizedBox(
+                                              width: 165.0,
+                                              height: 250.0,
+                                              child: Shimmer.fromColors(
+                                                baseColor: Colors.white,
+                                                highlightColor: Colors.grey.shade100,
+                                                child: Container(
+                                                  width: 500.0,
+                                                  height: 500.0,
+                                                  color: Colors.white,
+                                                )
+                                              ),
+                                            );
+                                          }
+                                        }
+                                    )
                               ),
                             )
                         ),
@@ -158,23 +226,26 @@ class _CategoryScreenState extends State<CategoryScreen>{
 
   @override
   Widget build(BuildContext context) {
-    Map<String, dynamic> subCategories = category["sub_categories"];
+    Map<String, dynamic> subCategories = {};
     List<String> subCategoriesIds = [];
-    for (String k in subCategories.keys) {
-      subCategoriesIds.add(k);
+    if (category.isNotEmpty) {
+      subCategories = category["sub_categories"];
+      for (String k in subCategories.keys) {
+        subCategoriesIds.add(k);
+      }
     }
     return Scaffold(
       body: SafeArea(
-          child: ListView.builder(
+          child: subCategories.isNotEmpty ? ListView.builder(
               shrinkWrap: true,
               itemCount: subCategories.length,
               itemBuilder: (context, index) {
                 return subCategoriesWidget(subCategoriesIds[index]);
               }
-          )
+          ) : CircularProgressIndicator(color: Colors.grey.shade300,)
       ),
         appBar: AppBar(
-            title: Text(
+            title: category.isNotEmpty ? Text(
                 category["name"],
                 style: TextStyle(
                     fontFamily: 'Beheshti',
@@ -182,6 +253,18 @@ class _CategoryScreenState extends State<CategoryScreen>{
                     fontSize: 20,
                     color: Colors.black
                 )
+            ) : SizedBox(
+              width: 70.0,
+              height: 30.0,
+              child: Shimmer.fromColors(
+                  baseColor: Colors.white,
+                  highlightColor: Colors.grey.shade100,
+                  child: Container(
+                    width: 10.0,
+                    height: 10.0,
+                    color: Colors.white,
+                  )
+              ),
             ),
             toolbarHeight: 80,
             centerTitle: true,
