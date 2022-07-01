@@ -47,6 +47,8 @@ dependencies:
   passwordfield: ^0.1.0
   expandable: any
   shared_preferences: any
+  shimmer: ^2.0.0
+  shamsi_date: any
   flutter:
     sdk: flutter
 
