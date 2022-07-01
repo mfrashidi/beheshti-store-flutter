@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:nama_kala/screens/add_new_product_screen.dart';
 import 'package:nama_kala/screens/product_screen.dart';
@@ -39,6 +40,27 @@ class _MyProductScreenState extends State<MyProductScreen> {
             productIds.add(i.toString());
           }
         });
+      });
+    });
+  }
+
+  Future<void> _removeProduct(String productID) async {
+    await Socket.connect("192.168.1.7", 4536).then((serverSocket) async {
+      String token = await getToken() ?? "nothing";
+      serverSocket.write("AUTH=" + token + ";REMOVE_PRODUCT=" + productID + "\n");
+      serverSocket.flush();
+      serverSocket.listen((response) async {
+        if (utf8.decode(response) == "DONE") {
+          Fluttertoast.showToast(
+            msg: "کالای شما با موفقیت حذف شد",
+            toastLength: Toast.LENGTH_LONG,
+            timeInSecForIosWeb: 1,
+            gravity: ToastGravity.CENTER,
+            backgroundColor: Colors.green,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
+        }
       });
     });
   }
@@ -91,6 +113,12 @@ class _MyProductScreenState extends State<MyProductScreen> {
                               child: GestureDetector(
                                 onTap: () {
                                   Navigator.of(context).push(CupertinoPageRoute(builder: (context) => AddNewProductScreen(product.data!)));
+                                },
+                                onLongPress: () {
+                                  setState(() {
+                                    _removeProduct(product.data!["product_id"]);
+                                    productIds.remove(product.data!["product_id"]);
+                                  });
                                 },
                                 child: Container(
                                   width: 165,
