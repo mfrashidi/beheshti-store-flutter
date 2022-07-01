@@ -1,9 +1,11 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:nama_kala/utils/converter.dart';
 import 'package:passwordfield/passwordfield.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -16,7 +18,6 @@ bool tryToLogin = true;
 TextEditingController nameController = TextEditingController();
 TextEditingController familyNameController = TextEditingController();
 TextEditingController phoneController = TextEditingController();
-TextEditingController storeNameController = TextEditingController();
 TextEditingController emailController = TextEditingController();
 TextEditingController passwordController = TextEditingController();
 
@@ -32,7 +33,6 @@ void setToken(String token) async {
   WidgetsFlutterBinding.ensureInitialized();
   final SharedPreferences prefs = await _prefs;
   prefs.setString('token', token);
-  print("Token set to " + (prefs.getString("token") ?? "nothing"));
 }
 
 class LoginScreen extends StatefulWidget {
@@ -44,7 +44,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginState extends State<LoginScreen> {
 
   void authenticate(String phoneNumber, String password) async{
-    await Socket.connect("192.168.1.3", 4536).then((serverSocket) {
+    await Socket.connect("192.168.1.7", 4536).then((serverSocket) {
       serverSocket.write("AUTHENTICATE=" + phoneSController.text + "," + passwordSController.text + "\n");
       serverSocket.flush();
       serverSocket.listen((response) {
@@ -76,6 +76,56 @@ class _LoginState extends State<LoginScreen> {
     });
   }
 
+  void signUp(String name, String lastName, String phoneNumber, String email, String password) async{
+    await Socket.connect("192.168.1.7", 4536).then((serverSocket) {
+      Map<String, String> user = {
+        "name": unNormalize(name),
+        "last_name": unNormalize(lastName),
+        "phone_number": phoneNumber,
+        "email": email,
+        "password": password
+      };
+      serverSocket.write("SIGN_UP=" + json.encode(user) + "\n");
+      serverSocket.flush();
+      serverSocket.listen((response) {
+        String result = String.fromCharCodes(response);
+        if (result.length == 64) {
+          Fluttertoast.showToast(
+            msg: "خوش آمدید",
+            toastLength: Toast.LENGTH_LONG,
+            timeInSecForIosWeb: 1,
+            gravity: ToastGravity.CENTER,
+            backgroundColor: Colors.green,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
+          setToken(result);
+          Navigator.of(context).pushReplacement(CupertinoPageRoute(builder: (context) => HomePage()));
+        } else if (result == "PHONE_NUMBER_EXISTED") {
+          Fluttertoast.showToast(
+            msg: "با این شماره تماس قبلا ثبت نام شده است",
+            toastLength: Toast.LENGTH_LONG,
+            timeInSecForIosWeb: 1,
+            gravity: ToastGravity.CENTER,
+            backgroundColor: Colors.redAccent,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
+        } else {
+          Fluttertoast.showToast(
+            msg: "در هنگام ثبت‌نام خطایی رخ داده است",
+            toastLength: Toast.LENGTH_LONG,
+            timeInSecForIosWeb: 1,
+            gravity: ToastGravity.CENTER,
+            backgroundColor: Colors.redAccent,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
+        }
+      });
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -84,7 +134,6 @@ class _LoginState extends State<LoginScreen> {
     nameController = TextEditingController();
     familyNameController = TextEditingController();
     phoneController = TextEditingController();
-    storeNameController = TextEditingController();
     emailController = TextEditingController();
     passwordController = TextEditingController();
 
@@ -136,16 +185,7 @@ class _LoginState extends State<LoginScreen> {
                   msg = "رمز عبور قابل قبول نیست";
                 } else {
                   isLoggedIn = true;
-                  // Navigator.of(context).push(CupertinoPageRoute(builder: (context) => HomePage()));
-                  Fluttertoast.showToast(
-                    msg: "خوش آمدید",
-                    toastLength: Toast.LENGTH_LONG,
-                    timeInSecForIosWeb: 1,
-                    gravity: ToastGravity.CENTER,
-                    backgroundColor: Colors.green,
-                    textColor: Colors.white,
-                    fontSize: 16.0,
-                  );
+                  signUp(nameController.text, familyNameController.text, phoneController.text, emailController.text, passwordController.text);
                 }
                 if (!isLoggedIn) {
                   Fluttertoast.showToast(
@@ -338,21 +378,6 @@ class _LoginState extends State<LoginScreen> {
                   ),
                 ),
                 TextField (
-                  controller: storeNameController,
-                  decoration: InputDecoration(
-                    border: UnderlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    labelStyle: TextStyle(
-                        fontFamily: 'Beheshti',
-                        fontWeight: FontWeight.normal,
-                        fontSize: 20,
-                        color: Colors.black
-                    ),
-                    labelText: 'نام فروشگاه',
-                  ),
-                ),
-                TextField (
                   controller: emailController,
                   decoration: InputDecoration(
                     border: UnderlineInputBorder(
@@ -465,7 +490,7 @@ class _LoginState extends State<LoginScreen> {
                 )
             ),
             hintText: 'رمز عبور',
-            passwordConstraint: r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$",
+            passwordConstraint: r"^.*$",
             border: PasswordBorder(
               border: UnderlineInputBorder(
                 borderSide: BorderSide(
@@ -481,8 +506,6 @@ class _LoginState extends State<LoginScreen> {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            errorMessage:
-            'رمز عبور قابل قبول نیست',
           ),
         ],
       ),
