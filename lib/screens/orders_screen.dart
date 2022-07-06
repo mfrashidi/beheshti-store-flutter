@@ -8,8 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:expandable/expandable.dart';
-import 'package:nama_kala/screens/product_screen.dart';
-import 'package:nama_kala/utils/converter.dart';
+import 'package:beheshti_store/screens/product_screen.dart';
+import 'package:beheshti_store/utils/converter.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 

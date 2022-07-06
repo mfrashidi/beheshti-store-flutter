@@ -8,8 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:line_icons/line_icons.dart';
-import 'package:nama_kala/screens/product_screen.dart';
-import 'package:nama_kala/utils/converter.dart';
+import 'package:beheshti_store/screens/product_screen.dart';
+import 'package:beheshti_store/utils/converter.dart';
 import 'package:shimmer/shimmer.dart';
 
 List<String> items = [];
