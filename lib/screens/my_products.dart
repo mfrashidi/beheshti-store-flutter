@@ -8,9 +8,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:line_icons/line_icons.dart';
-import 'package:nama_kala/screens/add_new_product_screen.dart';
-import 'package:nama_kala/screens/product_screen.dart';
-import 'package:nama_kala/screens/profile_screen.dart';
+import 'package:beheshti_store/screens/add_new_product_screen.dart';
+import 'package:beheshti_store/screens/product_screen.dart';
+import 'package:beheshti_store/screens/profile_screen.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../assets/item_card.dart';
